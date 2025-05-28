@@ -1,0 +1,52 @@
+EKE_Backend/.vs/EKE_Backend/CopilotIndices/17.14.698.11175/CodeChunks.db
+EKE_Backend/.vs/EKE_Backend/CopilotIndices/17.14.698.11175/CodeChunks.db-shm
+EKE_Backend/.vs/EKE_Backend/CopilotIndices/17.14.698.11175/CodeChunks.db-wal
+EKE_Backend/.vs/EKE_Backend/CopilotIndices/17.14.698.11175/SemanticSymbols.db
+EKE_Backend/.vs/EKE_Backend/CopilotIndices/17.14.698.11175/SemanticSymbols.db-shm
+EKE_Backend/.vs/EKE_Backend/CopilotIndices/17.14.698.11175/SemanticSymbols.db-wal
+EKE_Backend/.vs/EKE_Backend/DesignTimeBuild/.dtbcache.v2
+EKE_Backend/.vs/EKE_Backend/FileContentIndex/3b7297d4-e2a9-4bde-bcea-6ede49c975bc.vsidx
+EKE_Backend/.vs/EKE_Backend/FileContentIndex/63db0b76-94b1-4829-8e9d-bb73bda87c81.vsidx
+EKE_Backend/.vs/EKE_Backend/FileContentIndex/d717e40d-d8dc-4c68-9b76-5001cdf85415.vsidx
+EKE_Backend/.vs/EKE_Backend/v17/.futdcache.v2
+EKE_Backend/.vs/EKE_Backend/v17/.suo
+EKE_Backend/EKE_Backend/obj/project.nuget.cache
+EKE_Backend/EKE_Backend/obj/EKE_Backend.csproj.nuget.g.targets
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+
+# Rider
+.idea/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# VS Cache
+*.db
+*.db-shm
+*.db-wal
+*.v2
+*.vsidx
+DocumentLayout*.json
+
+# Logs
+*.log
+
+# Others
+*.swp
+*.bak
+*.tmp
+
+# Secrets (optional)
+appsettings.Development.json
