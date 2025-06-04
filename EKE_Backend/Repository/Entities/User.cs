@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IBTSS.Repository.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -31,7 +32,7 @@ namespace Repository.Entities
         public string Gender { get; set; } // "Nam" / "Nữ"
 
         [Required]
-        public string Role { get; set; } // "Tutor", "Student", "Admin"
+        public UserRole Role { get; set; } // ✅ Dùng enum thay cho string
 
         // Navigation
         public ICollection<StudentProfile> StudentProfiles { get; set; }
