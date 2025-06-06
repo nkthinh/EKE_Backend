@@ -116,7 +116,7 @@ namespace Service.Services.Users
             {
                 Token = token,
                 RefreshToken = refreshToken,
-                Expires = DateTime.UtcNow.AddMinutes(60), // Or get from config
+                Expires = DateTime.UtcNow.AddMinutes(5), // Or get from config
                 User = _mapper.Map<UserResponseDto>(user)
             };
         }
