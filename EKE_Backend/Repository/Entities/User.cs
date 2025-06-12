@@ -1,41 +1,34 @@
-﻿using IBTSS.Repository.Enum;
+﻿using Repository.Enums;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Repository.Entities
 {
-    public class User
+    public class User : BaseEntity
     {
-        [Key]
-        public int UserId { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string PasswordHash { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public string? Phone { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+        public Gender? Gender { get; set; }
+        public UserRole Role { get; set; }
+        public string? ProfileImage { get; set; }
+        public string? Address { get; set; }
+        public string? City { get; set; }
+        public string? District { get; set; }
+        public string? Bio { get; set; }
+        public bool IsVerified { get; set; } = false;
+        public bool IsActive { get; set; } = true;
 
-        [Required, StringLength(100)]
-        public string FullName { get; set; }
-
-        [Required, EmailAddress]
-        public string Email { get; set; }
-
-        [Required, StringLength(20)]
-        public string PhoneNumber { get; set; }
-
-        [Required]
-        public string PasswordHash { get; set; }
-
-        [DataType(DataType.Date)]
-        public DateTime DateOfBirth { get; set; }
-
-        [StringLength(10)]
-        public string Gender { get; set; } // "Nam" / "Nữ"
-
-        [Required]
-        public UserRole Role { get; set; } // ✅ Dùng enum thay cho string
-
-        // Navigation
-        public ICollection<StudentProfile> StudentProfiles { get; set; }
-        public TutorProfile TutorProfile { get; set; }
+        // Navigation Properties
+        public Student? Student { get; set; }
+        public Tutor? Tutor { get; set; }
+        public ICollection<Message> Messages { get; set; } = new List<Message>();
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+        public ICollection<AiChatSession> AiChatSessions { get; set; } = new List<AiChatSession>();
     }
 }

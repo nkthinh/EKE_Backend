@@ -1,4 +1,5 @@
-﻿using Service.DTO.Request;
+﻿using Repository.Enums;
+using Service.DTO.Request;
 using Service.DTO.Response;
 using System;
 using System.Collections.Generic;
@@ -10,16 +11,41 @@ namespace Service.Services.Users
 {
     public interface IUserService
     {
-        Task<UserResponseDto> GetUserByIdAsync(int id);
-        Task<UserResponseDto> GetUserByEmailAsync(string email);
+        // Basic CRUD Operations
+        Task<UserResponseDto?> GetUserByIdAsync(long id);
+        Task<UserResponseDto?> GetUserByEmailAsync(string email);
         Task<IEnumerable<UserResponseDto>> GetAllUsersAsync();
         Task<UserResponseDto> CreateUserAsync(UserCreateDto userCreateDto);
-        Task<UserResponseDto> UpdateUserAsync(int id, UserUpdateDto userUpdateDto);
-        Task<bool> DeleteUserAsync(int id);
-        Task<bool> UserExistsAsync(int id);
+        Task<UserResponseDto> UpdateUserAsync(long id, UserUpdateDto userUpdateDto);
+        Task<bool> DeleteUserAsync(long id);
+        Task<bool> UserExistsAsync(long id);
         Task<bool> EmailExistsAsync(string email);
-        Task<LoginResponseDto> AuthenticateAsync(UserLoginDto loginDto);
+
+        // Authentication
+        Task<LoginResponseDto?> AuthenticateAsync(UserLoginDto loginDto);
+        Task<bool> ChangePasswordAsync(long userId, string currentPassword, string newPassword);
+        Task<LoginResponseDto?> RefreshTokenAsync(string refreshToken);
+
+        // Pagination & Filtering
         Task<(IEnumerable<UserResponseDto> Users, int TotalCount)> GetPagedUsersAsync(int page, int pageSize);
-        Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
+        Task<IEnumerable<UserResponseDto>> GetUsersByRoleAsync(UserRole role);
+        Task<IEnumerable<UserResponseDto>> SearchUsersAsync(string searchTerm);
+
+        // Role-specific Operations
+        Task<IEnumerable<StudentResponseDto>> GetStudentsAsync();
+        Task<IEnumerable<TutorResponseDto>> GetTutorsAsync();
+        Task<IEnumerable<TutorResponseDto>> GetVerifiedTutorsAsync();
+        Task<IEnumerable<TutorResponseDto>> GetFeaturedTutorsAsync();
+
+        // Profile Management
+        Task<UserResponseDto> UpdateProfileAsync(long userId, UserProfileUpdateDto profileUpdateDto);
+        Task<bool> UploadProfileImageAsync(long userId, string imageUrl);
+        Task<bool> VerifyUserAsync(long userId);
+        Task<bool> DeactivateUserAsync(long userId);
+        Task<bool> ActivateUserAsync(long userId);
+
+        // Statistics
+        Task<UserStatsDto> GetUserStatsAsync();
+        Task<UserDashboardDto> GetUserDashboardAsync(long userId);
     }
 }

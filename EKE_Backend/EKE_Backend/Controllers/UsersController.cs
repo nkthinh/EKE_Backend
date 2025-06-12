@@ -1,4 +1,4 @@
-﻿using IBTSS.Repository.Enum;
+﻿using Repository.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -38,11 +38,11 @@ namespace EKE_Backend.Controllers
         // GET: api/users/5 - Admin có thể xem bất kỳ user nào, user khác chỉ xem được chính mình
         [HttpGet("{id}")]
         [Authorize]
-        public async Task<IActionResult> GetUser(int id)
+        public async Task<IActionResult> GetUser(long id)
         {
             try
             {
-                var currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var currentUserId = long.Parse(User.FindFirst("UserId")?.Value ?? "0");
                 var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
                 // Admin có thể xem bất kỳ user nào, user khác chỉ xem được chính mình
@@ -72,7 +72,7 @@ namespace EKE_Backend.Controllers
         {
             try
             {
-                var currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var currentUserId = long.Parse(User.FindFirst("UserId")?.Value ?? "0");
                 var user = await _userService.GetUserByIdAsync(currentUserId);
 
                 if (user == null)
@@ -131,7 +131,7 @@ namespace EKE_Backend.Controllers
             try
             {
                 var user = await _userService.CreateUserAsync(userCreateDto);
-                return CreatedAtAction(nameof(GetUser), new { id = user.UserId },
+                return CreatedAtAction(nameof(GetUser), new { id = user.Id },
                     new { success = true, data = user });
             }
             catch (InvalidOperationException ex)
@@ -147,7 +147,7 @@ namespace EKE_Backend.Controllers
         // PUT: api/users/5 - Admin có thể update bất kỳ user nào, user khác chỉ update được chính mình
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto userUpdateDto)
+        public async Task<IActionResult> UpdateUser(long id, [FromBody] UserUpdateDto userUpdateDto)
         {
             if (!ModelState.IsValid)
             {
@@ -156,7 +156,7 @@ namespace EKE_Backend.Controllers
 
             try
             {
-                var currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var currentUserId = long.Parse(User.FindFirst("UserId")?.Value ?? "0");
                 var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
                 // Admin có thể update bất kỳ user nào, user khác chỉ update được chính mình
@@ -169,7 +169,7 @@ namespace EKE_Backend.Controllers
                 if (currentUserRole != "Admin" && currentUserId == id)
                 {
                     var currentUser = await _userService.GetUserByIdAsync(currentUserId);
-                    if (currentUser.Role != userUpdateDto.Role)
+                    if (currentUser != null && currentUser.Role != userUpdateDto.Role)
                     {
                         return Forbid("You cannot change your own role");
                     }
@@ -195,7 +195,7 @@ namespace EKE_Backend.Controllers
         // DELETE: api/users/5 - Chỉ Admin
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(long id)
         {
             try
             {
@@ -251,7 +251,7 @@ namespace EKE_Backend.Controllers
 
             try
             {
-                var currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var currentUserId = long.Parse(User.FindFirst("UserId")?.Value ?? "0");
 
                 var success = await _userService.ChangePasswordAsync(currentUserId,
                     changePasswordDto.CurrentPassword, changePasswordDto.NewPassword);
@@ -292,8 +292,7 @@ namespace EKE_Backend.Controllers
         {
             try
             {
-                var users = await _userService.GetAllUsersAsync();
-                var students = users.Where(u => u.Role == UserRole.Student);
+                var students = await _userService.GetStudentsAsync();
                 return Ok(new { success = true, data = students });
             }
             catch (Exception ex)
@@ -309,9 +308,41 @@ namespace EKE_Backend.Controllers
         {
             try
             {
-                var users = await _userService.GetAllUsersAsync();
-                var tutors = users.Where(u => u.Role == UserRole.Tutor);
+                var tutors = await _userService.GetTutorsAsync();
                 return Ok(new { success = true, data = tutors });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        // GET: api/users/stats - Admin only
+        [HttpGet("stats")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUserStats()
+        {
+            try
+            {
+                var stats = await _userService.GetUserStatsAsync();
+                return Ok(new { success = true, data = stats });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        // GET: api/users/dashboard - Authenticated users
+        [HttpGet("dashboard")]
+        [Authorize]
+        public async Task<IActionResult> GetUserDashboard()
+        {
+            try
+            {
+                var currentUserId = long.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var dashboard = await _userService.GetUserDashboardAsync(currentUserId);
+                return Ok(new { success = true, data = dashboard });
             }
             catch (Exception ex)
             {

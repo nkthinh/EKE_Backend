@@ -15,11 +15,11 @@ namespace Service.Mapping
         public UserMappingProfile()
         {
             CreateMap<UserCreateDto, User>()
-                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
 
             CreateMap<UserUpdateDto, User>()
-                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
 
             CreateMap<User, UserResponseDto>();

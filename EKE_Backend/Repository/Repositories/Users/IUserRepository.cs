@@ -1,23 +1,37 @@
-﻿using Repository.Entities;
+﻿using Repository.Enums;
+using Repository.Entities;
+using Repository.Repositories.BaseRepository;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Repository.Repositories.Users
 {
-    public interface IUserRepository
+    public interface IUserRepository : IBaseRepository<User>
     {
-        Task<User> GetByIdAsync(int id);
-        Task<User> GetByEmailAsync(string email);
-        Task<IEnumerable<User>> GetAllAsync();
-        Task<IEnumerable<User>> FindAsync(Expression<Func<User, bool>> predicate);
-        Task<User> AddAsync(User user);
-        Task<User> UpdateAsync(User user);
-        Task<bool> DeleteAsync(int id);
-        Task<bool> ExistsAsync(int id);
+        // Basic User Operations
+        Task<User?> GetByEmailAsync(string email);
+        Task<User?> GetUserWithDetailsAsync(long id);
         Task<bool> EmailExistsAsync(string email);
-        Task<IEnumerable<User>> GetPagedAsync(int page, int pageSize);
-        Task<int> CountAsync();
+        Task<IEnumerable<User>> GetAllActiveUsersAsync();
+        Task<IEnumerable<User>> GetUsersByRoleAsync(UserRole role);
+
+        // Pagination & Search
+        Task<(IEnumerable<User> Users, int TotalCount)> GetPagedUsersAsync(int page, int pageSize);
+        Task<IEnumerable<User>> SearchUsersAsync(string searchTerm);
+
+        // Authentication Related
+        Task<User?> GetUserForAuthenticationAsync(string email);
+        Task<bool> IsUserActiveAsync(long userId);
+
+        // Profile Management
+        Task<bool> UpdateProfileImageAsync(long userId, string imageUrl);
+        Task<bool> VerifyUserAsync(long userId);
+
+        // Statistics
+        Task<int> GetActiveUsersCountAsync();
+        Task<int> GetUsersCountByRoleAsync(UserRole role);
+        Task<int> GetNewUsersCountSinceAsync(DateTime since);
     }
 }
