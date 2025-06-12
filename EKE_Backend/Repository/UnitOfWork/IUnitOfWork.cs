@@ -14,8 +14,9 @@ namespace Repository.UnitOfWork
     {
         // Repository Properties
         IUserRepository Users { get; }
-        IStudentService Students { get; }
+        IStudentRepository Students { get; }
         ITutorRepository Tutors { get; }
+        ITutorSubjectRepository TutorSubjects { get; }
         // Add other repositories as needed
         // ISubjectRepository Subjects { get; }
         // ISwipeActionRepository SwipeActions { get; }

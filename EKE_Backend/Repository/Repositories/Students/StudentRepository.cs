@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Repository.Repositories.Students
 {
-    public class StudentRepository : BaseRepository<Student>, IStudentService
+    public class StudentRepository : BaseRepository<Student>, IStudentRepository
     {
         public StudentRepository(ApplicationDbContext context) : base(context) { }
 

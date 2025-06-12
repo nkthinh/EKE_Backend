@@ -6,6 +6,7 @@ using Service.Mapping;
 using Repository.Repositories.Students;
 using Repository.Repositories.Tutors;
 using Repository.UnitOfWork;
+using Service.Services.Auth;
 
 namespace EKE_Backend
 {
@@ -18,7 +19,7 @@ namespace EKE_Backend
             services.AddAutoMapper(typeof(UserMappingProfile));
            
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IStudentService, StudentRepository>();
+            services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<ITutorRepository, TutorRepository>();
 
 
@@ -27,6 +28,7 @@ namespace EKE_Backend
             //services.AddScoped<IStudentService, StudentService>();
             //services.AddScoped<ITutorService, TutorService>();
             services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }

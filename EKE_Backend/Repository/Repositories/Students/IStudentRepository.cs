@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Repository.Repositories.Students
 {
-    public interface IStudentService : IBaseRepository<Student>
+    public interface IStudentRepository : IBaseRepository<Student>
     {
         Task<Student?> GetStudentWithUserInfoAsync(long studentId);
         Task<IEnumerable<Student>> GetStudentsWithUserInfoAsync();

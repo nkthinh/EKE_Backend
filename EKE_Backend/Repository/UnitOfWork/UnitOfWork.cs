@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using Repository;
+using Repository.Entities;
 using Repository.Repositories.Students;
 using Repository.Repositories.Tutors;
 using Repository.Repositories.Users;
@@ -15,9 +16,9 @@ namespace Repository.UnitOfWork
 
         // Repository instances
         private IUserRepository? _users;
-        private IStudentService? _students;
+        private IStudentRepository? _students;
         private ITutorRepository? _tutors;
-
+        private ITutorSubjectRepository? _tutorSubjects;
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
@@ -25,9 +26,9 @@ namespace Repository.UnitOfWork
 
         // Repository Properties - Lazy Loading
         public IUserRepository Users => _users ??= new UserRepository(_context);
-        public IStudentService Students => _students ??= new StudentRepository(_context);
+        public IStudentRepository Students => _students ??= new StudentRepository(_context);
         public ITutorRepository Tutors => _tutors ??= new TutorRepository(_context);
-
+        public ITutorSubjectRepository TutorSubjects => _tutorSubjects ??= new TutorSubjectRepository(_context);
         public async Task<int> CompleteAsync()
         {
             try
