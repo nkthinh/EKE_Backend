@@ -1,5 +1,7 @@
 ﻿
+using Repository.Repositories.Certifications;
 using Repository.Repositories.Students;
+using Repository.Repositories.Subjects;
 using Repository.Repositories.Tutors;
 using Repository.Repositories.Users;
 using System;
@@ -17,6 +19,8 @@ namespace Repository.UnitOfWork
         IStudentRepository Students { get; }
         ITutorRepository Tutors { get; }
         ITutorSubjectRepository TutorSubjects { get; }
+        ISubjectRepository Subjects { get; }
+        ICertificationRepository Certifications { get; }
         // Add other repositories as needed
         // ISubjectRepository Subjects { get; }
         // ISwipeActionRepository SwipeActions { get; }

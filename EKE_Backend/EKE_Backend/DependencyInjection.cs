@@ -1,12 +1,17 @@
 ﻿using Repository;
-using Repository.Repositories.Users;  
-using Service.Services.Users;        
-using Service.Services.Jwt;           
-using Service.Mapping;
 using Repository.Repositories.Students;
 using Repository.Repositories.Tutors;
+using Repository.Repositories.Users;  
 using Repository.UnitOfWork;
+using Service.Firebase;
+using Service.Mapping;
 using Service.Services.Auth;
+using Service.Services.Certifications;
+using Service.Services.Jwt;
+using Service.Services.Locations;
+using Service.Services.Subjects;
+using Service.Services.TutorSubjects;
+using Service.Services.Users;        
 
 namespace EKE_Backend
 {
@@ -21,7 +26,10 @@ namespace EKE_Backend
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<ITutorRepository, TutorRepository>();
-
+            services.AddScoped<ISubjectService, SubjectService>();
+            services.AddScoped<ITutorSubjectService, TutorSubjectService>();
+            services.AddScoped<ICertificationService, CertificationService>();
+            services.AddScoped<ILocationService, LocationService>();
 
 
             services.AddScoped<IUserService, UserService>();
@@ -29,7 +37,12 @@ namespace EKE_Backend
             //services.AddScoped<ITutorService, TutorService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();         
+            services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
+            services.AddScoped<ISubjectService, SubjectService>();
+            services.AddScoped<ITutorSubjectService, TutorSubjectService>();
+            services.AddScoped<ICertificationService, CertificationService>();
+            services.AddScoped<ILocationService, LocationService>();
             return services;
         }
     }

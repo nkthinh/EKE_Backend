@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Service.Firebase;
 
 namespace Service.Services.Users
 {
@@ -22,17 +24,20 @@ namespace Service.Services.Users
         private readonly IMapper _mapper;
         private readonly IJwtService _jwtService;
         private readonly ILogger<UserService> _logger;
-
+        private readonly IFirebaseStorageService _firebaseStorageService; 
+        
         public UserService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             IJwtService jwtService,
-            ILogger<UserService> logger)
+            ILogger<UserService> logger,
+            IFirebaseStorageService firebaseStorageService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _jwtService = jwtService;
             _logger = logger;
+            _firebaseStorageService = firebaseStorageService;
         }
 
         #region Basic CRUD Operations
@@ -555,6 +560,41 @@ namespace Service.Services.Users
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting user dashboard: {UserId}", userId);
+                throw;
+            }
+        }
+
+
+        // Thêm vào UserService
+        public async Task<string> UploadProfileImageAsync(long userId, IFormFile imageFile)
+        {
+            try
+            {
+                var user = await _unitOfWork.Users.GetByIdAsync(userId);
+                if (user == null)
+                    throw new ArgumentException("Không tìm thấy người dùng");
+
+                // Xóa ảnh cũ nếu có
+                if (!string.IsNullOrEmpty(user.ProfileImage))
+                {
+                    await _firebaseStorageService.DeleteImageAsync(user.ProfileImage);
+                }
+
+                // Upload ảnh mới
+                var imageUrl = await _firebaseStorageService.UploadImageAsync(imageFile, "profiles", userId);
+
+                // Cập nhật database
+                user.ProfileImage = imageUrl;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                _unitOfWork.Users.Update(user);
+                await _unitOfWork.CompleteAsync();
+
+                return imageUrl;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error uploading profile image for user: {UserId}", userId);
                 throw;
             }
         }

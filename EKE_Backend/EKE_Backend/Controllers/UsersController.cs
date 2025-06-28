@@ -349,6 +349,48 @@ namespace EKE_Backend.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
+
+        [HttpPost("upload-profile-image")]
+        [Authorize]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadProfileImage([FromForm] FileUploadDto uploadDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { success = false, message = "Invalid data", errors = ModelState });
+            }
+
+            var imageFile = uploadDto.ImageFile;
+
+            if (imageFile == null || imageFile.Length == 0)
+            {
+                return BadRequest(new { success = false, message = "No image file provided" });
+            }
+
+            // Validate file type và size
+            var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png" };
+            if (!allowedTypes.Contains(imageFile.ContentType.ToLower()))
+            {
+                return BadRequest(new { success = false, message = "Only JPEG and PNG files are allowed" });
+            }
+
+            if (imageFile.Length > 5 * 1024 * 1024) // 5MB
+            {
+                return BadRequest(new { success = false, message = "File size cannot exceed 5MB" });
+            }
+
+            try
+            {
+                var currentUserId = long.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var imageUrl = await _userService.UploadProfileImageAsync(currentUserId, imageFile);
+
+                return Ok(new { success = true, data = new { imageUrl } });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }    
     }
 }
 

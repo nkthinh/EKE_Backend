@@ -1,4 +1,5 @@
 using EKE_Backend;
+using EKE_Backend.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -53,7 +54,7 @@ namespace EKE_Backend
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new() { Title = "IBTSS API", Version = "v1" });
-
+                options.OperationFilter<FileUploadOperationFilter>();
                 // JWT Bearer configuration for Swagger
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {

@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using Repository;
 using Repository.Entities;
+using Repository.Repositories.Certifications;
 using Repository.Repositories.Students;
+using Repository.Repositories.Subjects;
 using Repository.Repositories.Tutors;
 using Repository.Repositories.Users;
 using System;
@@ -19,6 +21,8 @@ namespace Repository.UnitOfWork
         private IStudentRepository? _students;
         private ITutorRepository? _tutors;
         private ITutorSubjectRepository? _tutorSubjects;
+        private ISubjectRepository? _subjects;
+        private ICertificationRepository? _certifications;
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
@@ -29,6 +33,8 @@ namespace Repository.UnitOfWork
         public IStudentRepository Students => _students ??= new StudentRepository(_context);
         public ITutorRepository Tutors => _tutors ??= new TutorRepository(_context);
         public ITutorSubjectRepository TutorSubjects => _tutorSubjects ??= new TutorSubjectRepository(_context);
+        public ISubjectRepository Subjects => _subjects ??= new SubjectRepository(_context);
+        public ICertificationRepository Certifications => _certifications ??= new CertificationRepository(_context);
         public async Task<int> CompleteAsync()
         {
             try
