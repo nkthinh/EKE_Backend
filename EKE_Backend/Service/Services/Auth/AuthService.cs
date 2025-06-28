@@ -6,11 +6,6 @@ using Repository.UnitOfWork;
 using Service.DTO.Request;
 using Service.DTO.Response;
 using Service.Services.Jwt;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service.Services.Auth
 {
@@ -33,6 +28,221 @@ namespace Service.Services.Auth
             _logger = logger;
         }
 
+        // STEP 1: Register Account
+        public async Task<RegistrationStepResponseDto> RegisterAccountAsync(AccountRegistrationDto accountDto)
+        {
+            try
+            {
+                // Check if email exists
+                if (await _unitOfWork.Users.EmailExistsAsync(accountDto.Email))
+                {
+                    throw new InvalidOperationException("Email đã được sử dụng");
+                }
+
+                // Create basic user account
+                var user = new User
+                {
+                    Email = accountDto.Email,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(accountDto.Password),
+                    FullName = accountDto.FullName,
+                    Role = UserRole.Unspecified, // Chưa chọn role
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                await _unitOfWork.Users.AddAsync(user);
+                await _unitOfWork.CompleteAsync();
+
+                // Generate tokens
+                var accessToken = _jwtService.GenerateAccessToken(user);
+                var refreshToken = _jwtService.GenerateRefreshToken();
+
+                return new RegistrationStepResponseDto
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken,
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtService.AccessTokenExpiryMinutes),
+                    User = _mapper.Map<UserResponseDto>(user),
+                    NextStep = "SelectRole",
+                    IsCompleted = false
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error registering account: {Email}", accountDto.Email);
+                throw;
+            }
+        }
+
+        // STEP 2: Select Role
+        public async Task<RegistrationStepResponseDto> SelectRoleAsync(long userId, RoleSelectionDto roleDto)
+        {
+            try
+            {
+                var user = await _unitOfWork.Users.GetByIdAsync(userId);
+                if (user == null)
+                {
+                    throw new InvalidOperationException("Người dùng không tồn tại");
+                }
+
+                if (user.Role != UserRole.Unspecified)
+                {
+                    throw new InvalidOperationException("Người dùng đã chọn vai trò");
+                }
+
+                // Validate and set role
+                if (!Enum.TryParse<UserRole>(roleDto.Role, out var role) ||
+                    role == UserRole.Unspecified || role == UserRole.Admin)
+                {
+                    throw new InvalidOperationException("Vai trò không hợp lệ");
+                }
+
+                user.Role = role;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                _unitOfWork.Users.Update(user);
+                await _unitOfWork.CompleteAsync();
+
+                // Generate new tokens with updated role
+                var accessToken = _jwtService.GenerateAccessToken(user);
+                var refreshToken = _jwtService.GenerateRefreshToken();
+
+                return new RegistrationStepResponseDto
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken,
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtService.AccessTokenExpiryMinutes),
+                    User = _mapper.Map<UserResponseDto>(user),
+                    NextStep = "CompleteProfile",
+                    IsCompleted = false
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error selecting role for user: {UserId}", userId);
+                throw;
+            }
+        }
+
+        // STEP 3: Complete Profile
+        public async Task<RegistrationStepResponseDto> CompleteProfileAsync(long userId, ProfileCompletionDto profileDto)
+        {
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                var user = await _unitOfWork.Users.GetByIdAsync(userId);
+                if (user == null)
+                {
+                    throw new InvalidOperationException("Người dùng không tồn tại");
+                }
+
+                if (user.Role == UserRole.Unspecified)
+                {
+                    throw new InvalidOperationException("Người dùng chưa chọn vai trò");
+                }
+
+                // Update user basic info
+                user.Phone = profileDto.Phone;
+                user.DateOfBirth = profileDto.DateOfBirth;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                _unitOfWork.Users.Update(user);
+                await _unitOfWork.CompleteAsync();
+
+                // Create role-specific profile
+                if (user.Role == UserRole.Student)
+                {
+                    await CreateStudentProfile(user.Id, profileDto);
+                }
+                else if (user.Role == UserRole.Tutor)
+                {
+                    await CreateTutorProfile(user.Id, profileDto);
+                }
+
+                await _unitOfWork.CommitTransactionAsync();
+
+                // Load user with complete profile - giả sử có method này
+                var userWithProfile = user; // Có thể cần reload từ DB nếu có navigation properties
+
+                // Generate final tokens
+                var accessToken = _jwtService.GenerateAccessToken(userWithProfile);
+                var refreshToken = _jwtService.GenerateRefreshToken();
+
+                return new RegistrationStepResponseDto
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken,
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtService.AccessTokenExpiryMinutes),
+                    User = _mapper.Map<UserResponseDto>(userWithProfile),
+                    NextStep = "Completed",
+                    IsCompleted = true
+                };
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                _logger.LogError(ex, "Error completing profile for user: {UserId}", userId);
+                throw;
+            }
+        }
+
+        private async Task CreateStudentProfile(long userId, ProfileCompletionDto profileDto)
+        {
+            var student = new Student
+            {
+                UserId = userId,
+                SchoolName = profileDto.SchoolName,
+                GradeLevel = profileDto.GradeLevel,
+                LearningGoals = profileDto.LearningGoals,
+                BudgetMin = profileDto.BudgetMin,
+                BudgetMax = profileDto.BudgetMax,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _unitOfWork.Students.AddAsync(student);
+            await _unitOfWork.CompleteAsync();
+        }
+
+        private async Task CreateTutorProfile(long userId, ProfileCompletionDto profileDto)
+        {
+            var tutor = new Tutor
+            {
+                UserId = userId,
+                EducationLevel = profileDto.EducationLevel ?? "",
+                University = profileDto.University,
+                Major = profileDto.Major,
+                ExperienceYears = profileDto.ExperienceYears ?? 0,
+                HourlyRate = profileDto.HourlyRate,
+                Introduction = profileDto.Introduction,
+                VerificationStatus = VerificationStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _unitOfWork.Tutors.AddAsync(tutor);
+            await _unitOfWork.CompleteAsync();
+
+            // Add tutor subjects if provided
+            if (profileDto.SubjectIds != null && profileDto.SubjectIds.Any())
+            {
+                var tutorSubjects = profileDto.SubjectIds.Select(subjectId => new TutorSubject
+                {
+                    TutorId = tutor.Id,
+                    SubjectId = subjectId,
+                    ProficiencyLevel = ProficiencyLevel.Intermediate,
+                    YearsExperience = 0,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+                await _unitOfWork.TutorSubjects.AddRangeAsync(tutorSubjects);
+                await _unitOfWork.CompleteAsync();
+            }
+        }
+
+        // Existing methods - sửa lại cho phù hợp với UnitOfWork
         public async Task<LoginResponseDto?> LoginAsync(UserLoginDto loginDto)
         {
             try
@@ -66,13 +276,11 @@ namespace Service.Services.Auth
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                // Check if email exists
                 if (await _unitOfWork.Users.EmailExistsAsync(studentSignUpDto.Email))
                 {
                     throw new InvalidOperationException("Email đã được sử dụng");
                 }
 
-                // Create User entity
                 var user = new User
                 {
                     Email = studentSignUpDto.Email,
@@ -89,7 +297,6 @@ namespace Service.Services.Auth
                 await _unitOfWork.Users.AddAsync(user);
                 await _unitOfWork.CompleteAsync();
 
-                // Create Student profile
                 var student = new Student
                 {
                     UserId = user.Id,
@@ -104,12 +311,9 @@ namespace Service.Services.Auth
 
                 await _unitOfWork.Students.AddAsync(student);
                 await _unitOfWork.CompleteAsync();
-
                 await _unitOfWork.CommitTransactionAsync();
 
-                // Load user with student profile
-                var userWithProfile = await _unitOfWork.Users.GetUserWithDetailsAsync(user.Id);
-                return _mapper.Map<UserResponseDto>(userWithProfile);
+                return _mapper.Map<UserResponseDto>(user);
             }
             catch (Exception ex)
             {
@@ -124,13 +328,11 @@ namespace Service.Services.Auth
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                // Check if email exists
                 if (await _unitOfWork.Users.EmailExistsAsync(tutorSignUpDto.Email))
                 {
                     throw new InvalidOperationException("Email đã được sử dụng");
                 }
 
-                // Create User entity
                 var user = new User
                 {
                     Email = tutorSignUpDto.Email,
@@ -147,7 +349,6 @@ namespace Service.Services.Auth
                 await _unitOfWork.Users.AddAsync(user);
                 await _unitOfWork.CompleteAsync();
 
-                // Create Tutor profile
                 var tutor = new Tutor
                 {
                     UserId = user.Id,
@@ -165,8 +366,7 @@ namespace Service.Services.Auth
                 await _unitOfWork.Tutors.AddAsync(tutor);
                 await _unitOfWork.CompleteAsync();
 
-                // Add tutor subjects if provided
-                if (tutorSignUpDto.SubjectIds.Any())
+                if (tutorSignUpDto.SubjectIds != null && tutorSignUpDto.SubjectIds.Any())
                 {
                     var tutorSubjects = tutorSignUpDto.SubjectIds.Select(subjectId => new TutorSubject
                     {
@@ -184,9 +384,7 @@ namespace Service.Services.Auth
 
                 await _unitOfWork.CommitTransactionAsync();
 
-                // Load user with tutor profile
-                var userWithProfile = await _unitOfWork.Users.GetUserWithDetailsAsync(user.Id);
-                return _mapper.Map<UserResponseDto>(userWithProfile);
+                return _mapper.Map<UserResponseDto>(user);
             }
             catch (Exception ex)
             {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Service.DTO.Request;
 using Service.Services.Auth;
+using System.Security.Claims;
 
 namespace EKE_Backend.Controllers
 {
@@ -43,7 +44,99 @@ namespace EKE_Backend.Controllers
             }
         }
 
-        // POST: api/auth/register/student
+        // STEP 1: Register Account (Email, Password, FullName)
+        [HttpPost("register/account")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RegisterAccount([FromBody] AccountRegistrationDto accountDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ", errors = ModelState });
+            }
+
+            try
+            {
+                var response = await _authService.RegisterAccountAsync(accountDto);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Tạo tài khoản thành công. Vui lòng chọn vai trò.",
+                    data = response
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        // STEP 2: Select Role (Student/Tutor)
+        [HttpPost("register/role")]
+        [Authorize]
+        public async Task<IActionResult> SelectRole([FromBody] RoleSelectionDto roleDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ", errors = ModelState });
+            }
+
+            try
+            {
+                var userId = GetCurrentUserId();
+                var response = await _authService.SelectRoleAsync(userId, roleDto);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Chọn vai trò thành công. Vui lòng hoàn thiện hồ sơ.",
+                    data = response
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Lỗi hệ thống" });
+            }
+        }
+
+        // STEP 3: Complete Profile
+        [HttpPost("register/profile")]
+        [Authorize]
+        public async Task<IActionResult> CompleteProfile([FromBody] ProfileCompletionDto profileDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ", errors = ModelState });
+            }
+
+            try
+            {
+                var userId = GetCurrentUserId();
+                var response = await _authService.CompleteProfileAsync(userId, profileDto);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Đăng ký hoàn tất thành công!",
+                    data = response
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Lỗi hệ thống" });
+            }
+        }
+
+        // Legacy endpoints - có thể giữ để backward compatibility
         [HttpPost("register/student")]
         [AllowAnonymous]
         public async Task<IActionResult> RegisterStudent([FromBody] StudentSignUpDto studentSignUpDto)
@@ -74,7 +167,6 @@ namespace EKE_Backend.Controllers
             }
         }
 
-        // POST: api/auth/register/tutor
         [HttpPost("register/tutor")]
         [AllowAnonymous]
         public async Task<IActionResult> RegisterTutor([FromBody] TutorSignUpDto tutorSignUpDto)
@@ -105,7 +197,7 @@ namespace EKE_Backend.Controllers
             }
         }
 
-        // POST: api/auth/refresh
+        // Existing endpoints...
         [HttpPost("refresh")]
         [AllowAnonymous]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
@@ -126,7 +218,6 @@ namespace EKE_Backend.Controllers
             }
         }
 
-        // POST: api/auth/logout
         [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> Logout([FromBody] RefreshTokenDto refreshTokenDto)
@@ -142,7 +233,6 @@ namespace EKE_Backend.Controllers
             }
         }
 
-        // GET: api/auth/check-email/{email}
         [HttpGet("check-email/{email}")]
         [AllowAnonymous]
         public async Task<IActionResult> CheckEmail(string email)
@@ -156,6 +246,17 @@ namespace EKE_Backend.Controllers
             {
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
+        }
+
+        // Helper method to get current user ID
+        private long GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !long.TryParse(userIdClaim, out long userId))
+            {
+                throw new UnauthorizedAccessException("Không thể xác định người dùng");
+            }
+            return userId;
         }
     }
 }

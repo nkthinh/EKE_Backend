@@ -15,7 +15,7 @@ namespace Repository.Entities
         public string? Phone { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public Gender? Gender { get; set; }
-        public UserRole Role { get; set; }
+        public UserRole? Role { get; set; }
         public string? ProfileImage { get; set; }
         public string? Address { get; set; }
         public string? City { get; set; }

@@ -8,6 +8,7 @@ namespace Repository.Enums
 {
     public enum UserRole
     {
+        Unspecified = 0,
         Student = 1,
         Tutor = 2,
         Admin = 3
