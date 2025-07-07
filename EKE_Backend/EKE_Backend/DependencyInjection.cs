@@ -7,6 +7,9 @@ using Repository.Repositories.Students;
 using Repository.Repositories.Tutors;
 using Repository.UnitOfWork;
 using Service.Services.Auth;
+using Repository.Repositories;
+using Application.Services.Interfaces;
+using Application.Services;
 
 namespace EKE_Backend
 {
@@ -23,7 +26,8 @@ namespace EKE_Backend
             services.AddScoped<ITutorRepository, TutorRepository>();
 
 
-
+            services.AddScoped<IMatchRepository, MatchRepository>();
+            services.AddScoped<IMatchService, MatchService>();
             services.AddScoped<IUserService, UserService>();
             //services.AddScoped<IStudentService, StudentService>();
             //services.AddScoped<ITutorService, TutorService>();
