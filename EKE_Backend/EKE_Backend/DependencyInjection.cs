@@ -24,9 +24,11 @@ namespace EKE_Backend
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<ITutorRepository, TutorRepository>();
-
-
+            services.AddScoped<IBookingRepository, BookingRepository>();
             services.AddScoped<IMatchRepository, MatchRepository>();
+
+
+            services.AddScoped<IBookingService, BookingService>();  
             services.AddScoped<IMatchService, MatchService>();
             services.AddScoped<IUserService, UserService>();
             //services.AddScoped<IStudentService, StudentService>();
