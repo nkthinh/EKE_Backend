@@ -57,4 +57,5 @@ namespace Service.DTO.Response
             ? $"{HourlyRate:N0} VNĐ/giờ"
             : "Thỏa thuận";
     }
+
 }

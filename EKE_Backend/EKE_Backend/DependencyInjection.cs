@@ -43,7 +43,7 @@ namespace EKE_Backend
             services.AddScoped<ICertificationService, CertificationService>();
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<ISwipeActionRepository, SwipeActionRepository>();
-            services.AddScoped<IMatchRepository, MatchRepository>();
+            services.AddScoped<Repository.Repositories.IMatchRepository, Repository.Repositories.MatchRepository>();
             services.AddScoped<IConversationRepository, ConversationRepository>();
             services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<IBookingRepository, BookingRepository>();       

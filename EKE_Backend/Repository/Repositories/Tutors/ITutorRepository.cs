@@ -17,5 +17,7 @@ namespace Repository.Repositories.Tutors
         Task<Tutor?> GetTutorByUserIdAsync(long userId);
         Task<IEnumerable<Tutor>> GetTutorsBySubjectAsync(long subjectId);
         Task<IEnumerable<Tutor>> GetTutorsByRatingAsync(decimal minRating);
-    }
+        Task<IEnumerable<Tutor>> GetAvailableTutorsForMatchingAsync(long studentId, IEnumerable<long> excludedTutorIds, int count);
+   
+        }
 }
