@@ -2,8 +2,10 @@
 using Repository;
 using Repository.Entities;
 using Repository.Repositories.Certifications;
+using Repository.Repositories.Matches;
 using Repository.Repositories.Students;
 using Repository.Repositories.Subjects;
+using Repository.Repositories.SwipeActions;
 using Repository.Repositories.Tutors;
 using Repository.Repositories.Users;
 using System;
@@ -23,6 +25,8 @@ namespace Repository.UnitOfWork
         private ITutorSubjectRepository? _tutorSubjects;
         private ISubjectRepository? _subjects;
         private ICertificationRepository? _certifications;
+        private IMatchRepository? _matches;
+        private ISwipeActionRepository? _swipeActions;
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
@@ -35,6 +39,9 @@ namespace Repository.UnitOfWork
         public ITutorSubjectRepository TutorSubjects => _tutorSubjects ??= new TutorSubjectRepository(_context);
         public ISubjectRepository Subjects => _subjects ??= new SubjectRepository(_context);
         public ICertificationRepository Certifications => _certifications ??= new CertificationRepository(_context);
+        public IMatchRepository Matches => _matches ??= new MatchRepository(_context);
+        public ISwipeActionRepository SwipeActions => _swipeActions=new SwipeActionRepository(_context);       
+
         public async Task<int> CompleteAsync()
         {
             try

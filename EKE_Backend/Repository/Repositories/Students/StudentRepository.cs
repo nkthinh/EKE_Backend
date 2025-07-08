@@ -35,5 +35,12 @@ namespace Repository.Repositories.Students
                 .Include(s => s.User)
                 .FirstOrDefaultAsync(s => s.UserId == userId);
         }
+        public async Task<Student?> GetByUserIdAsync(long userId)
+        {
+            return await _dbSet
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+        }
+      
     }
 }
