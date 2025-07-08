@@ -17,12 +17,5 @@ namespace Service.DTO.Request
         public SwipeActionType Action { get; set; } // Like, Dislike
     }
 
-    public class MatchResponseDto
-    {
-        [Required]
-        public long MatchId { get; set; }
-
-        [Required]
-        public bool Accept { get; set; }
-    }
+  
 }

@@ -10,6 +10,7 @@ using Repository.UnitOfWork;
 using Service.Firebase;
 using Service.Mapping;
 using Service.Services.Auth;
+
 using Service.Services.Certifications;
 using Service.Services.Jwt;
 using Service.Services.Locations;
@@ -17,6 +18,11 @@ using Service.Services.Matching;
 using Service.Services.Subjects;
 using Service.Services.TutorSubjects;
 using Service.Services.Users;        
+
+using Repository.Repositories;
+using Application.Services.Interfaces;
+using Application.Services;
+using Service.Services.Chat;
 
 namespace EKE_Backend
 {
@@ -31,6 +37,7 @@ namespace EKE_Backend
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<ITutorRepository, TutorRepository>();
+
             services.AddScoped<ISubjectService, SubjectService>();
             services.AddScoped<ITutorSubjectService, TutorSubjectService>();
             services.AddScoped<ICertificationService, CertificationService>();
@@ -39,8 +46,9 @@ namespace EKE_Backend
             services.AddScoped<IMatchRepository, MatchRepository>();
             services.AddScoped<IConversationRepository, ConversationRepository>();
             services.AddScoped<IMessageRepository, MessageRepository>();
-
-
+            services.AddScoped<IBookingRepository, BookingRepository>();       
+            services.AddScoped<IBookingService, BookingService>();  
+            services.AddScoped<IMatchService, MatchService>();
             services.AddScoped<IUserService, UserService>();
             //services.AddScoped<IStudentService, StudentService>();
             //services.AddScoped<ITutorService, TutorService>();
