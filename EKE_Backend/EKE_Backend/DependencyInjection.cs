@@ -23,6 +23,10 @@ using Repository.Repositories;
 using Application.Services.Interfaces;
 using Application.Services;
 using Service.Services.Chat;
+using Repository.Repositories.Reviews;
+using Service.Services.Reviews;
+using Repository.Repositories.Notifications;
+using Service.Services.Notifications;
 
 namespace EKE_Backend
 {
@@ -30,7 +34,7 @@ namespace EKE_Backend
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
-           
+           //Repo
             services.AddDbContext<ApplicationDbContext>();
             services.AddAutoMapper(typeof(UserMappingProfile));
            
@@ -46,7 +50,12 @@ namespace EKE_Backend
             services.AddScoped<Repository.Repositories.IMatchRepository, Repository.Repositories.MatchRepository>();
             services.AddScoped<IConversationRepository, ConversationRepository>();
             services.AddScoped<IMessageRepository, MessageRepository>();
-            services.AddScoped<IBookingRepository, BookingRepository>();       
+            services.AddScoped<IBookingRepository, BookingRepository>();    
+            services.AddScoped<IReviewRepository, ReviewRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
+
+
+            //Service
             services.AddScoped<IBookingService, BookingService>();  
             services.AddScoped<IMatchService, MatchService>();
             services.AddScoped<IUserService, UserService>();
@@ -63,7 +72,8 @@ namespace EKE_Backend
             // Matching and Chat services
             services.AddScoped<IMatchingService, MatchingService>();
             services.AddScoped<IChatService, ChatService>();
-
+            services.AddScoped<IReviewService, ReviewService>();
+            services.AddScoped<INotificationService, NotificationService>();
             return services;
         }
     }
