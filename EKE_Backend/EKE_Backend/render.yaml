@@ -3,3 +3,4 @@ services:
     name: eke-backend
     env: docker
     plan: free
+    dockerfilePath: ./Dockerfile
