@@ -1,5 +1,5 @@
 services:
   - type: web
     name: eke-backend
-    runtime: docker         
+    env: docker
     plan: free
