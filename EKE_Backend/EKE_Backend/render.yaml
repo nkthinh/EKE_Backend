@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: eke-backend
+    plan: free
+    buildCommand: dotnet publish -c Release -o out
+    startCommand: dotnet out/EKE_Backend.dll
+    autoDeploy: true
