@@ -1,6 +1,7 @@
 services:
   - type: web
     name: eke-backend
-    env: docker
     plan: free
-    dockerfilePath: ./Dockerfile
+    buildCommand: dotnet publish -c Release -o out
+    startCommand: dotnet out/EKE_Backend.dll
+    autoDeploy: true
