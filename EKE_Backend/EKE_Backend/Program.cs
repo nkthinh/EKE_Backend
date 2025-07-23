@@ -12,7 +12,9 @@ namespace EKE_Backend
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);          
+            var builder = WebApplication.CreateBuilder(args);
+            // Cấu hình URLs để lắng nghe trên tất cả IP
+            builder.WebHost.UseUrls("http://0.0.0.0:5195", "https://0.0.0.0:7103");
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddDbContext<ApplicationDbContext>();
