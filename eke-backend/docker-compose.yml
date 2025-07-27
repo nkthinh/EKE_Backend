@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  eke-sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: eke-sqlserver
+    environment:
+      SA_PASSWORD: "MyPass123!"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlvolume:/var/opt/mssql
+
+  eke-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: eke-backend
+    ports:
+      - "8080:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=eke-sqlserver;Database=EKEBackend_1;User Id=sa;Password=MyPass123!;TrustServerCertificate=true;MultipleActiveResultSets=true
+    depends_on:
+      - eke-sqlserver
+
+volumes:
+  sqlvolume:

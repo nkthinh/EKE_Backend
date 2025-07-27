@@ -1,0 +1,10 @@
+**/.vscode
+**/.vs
+**/.git
+**/bin
+**/obj
+**/.gitignore
+**/*.user
+**/*.suo
+**/*.cache
+**/.DS_Store

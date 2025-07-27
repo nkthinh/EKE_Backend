@@ -1,0 +1,118 @@
+using EKE_Backend;
+using EKE_Backend.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Repository;
+using System.Text;
+using Microsoft.EntityFrameworkCore;
+
+namespace EKE_Backend
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
+            // Cấu hình URLs để lắng nghe trên tất cả IP
+
+            // builder.WebHost.UseUrls("http://0.0.0.0:5195", "https://0.0.0.0:7103");
+            var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+            builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+            builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
+            // builder.Services.AddDbContext<ApplicationDbContext>();
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+            // APPLICATION SERVICES (Database, Repository, Services, AutoMapper)      
+            builder.Services.AddApplicationServices(builder.Configuration);
+            // AUTHENTICATION & AUTHORIZATION       
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
+                        )
+                    };
+                });
+
+            builder.Services.AddAuthorization();
+            // CORS CONFIGURATION 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
+            // SIGNALR       
+            builder.Services.AddSignalR();
+            // SWAGGER CONFIGURATION
+
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new() { Title = "IBTSS API", Version = "v1" });
+                options.OperationFilter<FileUploadOperationFilter>();
+                // JWT Bearer configuration for Swagger
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Nhập JWT token dạng: Bearer {token}"
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
+            var app = builder.Build();
+            // Apply database migrations automatically at startup
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                db.Database.Migrate();
+            }
+
+            //if (app.Environment.IsDevelopment())
+            //{
+            //    app.UseSwagger();
+            //    app.UseSwaggerUI();
+            //}
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            app.UseCors("AllowAll");
+            app.UseHttpsRedirection();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.MapControllers();
+
+            app.Run();
+        }
+    }
+}
