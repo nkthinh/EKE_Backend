@@ -24,6 +24,7 @@ namespace Service.DTO.Response
         public decimal AverageRating { get; set; }
         public int TotalReviews { get; set; }
         public bool IsFeatured { get; set; }
+        public string? ProfileImage { get; set; }
         public VerificationStatus VerificationStatus { get; set; }
         public string VerificationStatusText => VerificationStatus switch
         {

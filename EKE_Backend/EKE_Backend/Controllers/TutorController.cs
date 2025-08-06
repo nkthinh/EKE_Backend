@@ -342,34 +342,34 @@ namespace EKE_Backend.Controllers
             }
         }
 
-        /// <summary>
-        /// Get tutor statistics - Admin or Tutor themselves
-        /// </summary>
-        /// <param name="id">Tutor ID</param>
-        /// <returns>Tutor statistics</returns>
-        [HttpGet("{id}/statistics")]
-        [Authorize]
-        public async Task<IActionResult> GetTutorStatistics(long id)
-        {
-            try
-            {
-                if (!CanAccessTutorData(id))
-                {
-                    return Forbid("Bạn không có quyền truy cập thông tin này");
-                }
+        ///// <summary>
+        ///// Get tutor statistics - Admin or Tutor themselves
+        ///// </summary>
+        ///// <param name="id">Tutor ID</param>
+        ///// <returns>Tutor statistics</returns>
+        //[HttpGet("{id}/statistics")]
+        //[Authorize]
+        //public async Task<IActionResult> GetTutorStatistics(long id)
+        //{
+        //    try
+        //    {
+        //        if (!CanAccessTutorData(id))
+        //        {
+        //            return Forbid("Bạn không có quyền truy cập thông tin này");
+        //        }
 
-                var stats = await _tutorService.GetTutorStatisticsAsync(id);
-                return Ok(new { success = true, data = stats });
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(new { success = false, message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
-        }
+        //        var stats = await _tutorService.GetTutorStatisticsAsync(id);
+        //        return Ok(new { success = true, data = stats });
+        //    }
+        //    catch (ArgumentException ex)
+        //    {
+        //        return NotFound(new { success = false, message = ex.Message });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { success = false, message = ex.Message });
+        //    }
+        //}
 
         /// <summary>
         /// Get tutors requiring verification - Admin only

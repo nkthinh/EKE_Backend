@@ -24,7 +24,7 @@ namespace Service.Services.Tutors
         Task<(IEnumerable<TutorSearchResultDto> Tutors, int TotalCount)> GetTutorsBySubjectAsync(long subjectId, int page, int pageSize);
         Task<IEnumerable<TutorSearchResultDto>> GetFeaturedTutorsAsync(int limit);
         Task<(IEnumerable<TutorSearchResultDto> Tutors, int TotalCount)> GetNearbyTutorsAsync(string city, string? district, int page, int pageSize);
-        Task<TutorStatisticsDto> GetTutorStatisticsAsync(long tutorId);
+        //Task<TutorStatisticsDto> GetTutorStatisticsAsync(long tutorId);
         Task<(IEnumerable<TutorSearchResultDto> Tutors, int TotalCount)> GetTutorsPendingVerificationAsync(int page, int pageSize);
         Task<(IEnumerable<DTO.Response.ReviewResponseDto> Reviews, int TotalCount, double AverageRating)> GetTutorReviewsAsync(long tutorId, int page, int pageSize);
         Task<IEnumerable<TutorSearchResultDto>> GetRecommendedTutorsAsync(long studentId, int limit);

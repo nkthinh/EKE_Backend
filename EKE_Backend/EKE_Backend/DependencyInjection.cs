@@ -1,7 +1,12 @@
-﻿using Repository;
+﻿using Application.Services;
+using Application.Services.Interfaces;
+using Repository;
+using Repository.Repositories;
 using Repository.Repositories.Conversations;
 using Repository.Repositories.Matches;
 using Repository.Repositories.Messages;
+using Repository.Repositories.Notifications;
+using Repository.Repositories.Reviews;
 using Repository.Repositories.Students;
 using Repository.Repositories.SwipeActions;
 using Repository.Repositories.Tutors;
@@ -10,23 +15,17 @@ using Repository.UnitOfWork;
 using Service.Firebase;
 using Service.Mapping;
 using Service.Services.Auth;
-
 using Service.Services.Certifications;
+using Service.Services.Chat;
 using Service.Services.Jwt;
 using Service.Services.Locations;
 using Service.Services.Matching;
+using Service.Services.Notifications;
+using Service.Services.Reviews;
 using Service.Services.Subjects;
+using Service.Services.Tutors;
 using Service.Services.TutorSubjects;
 using Service.Services.Users;        
-
-using Repository.Repositories;
-using Application.Services.Interfaces;
-using Application.Services;
-using Service.Services.Chat;
-using Repository.Repositories.Reviews;
-using Service.Services.Reviews;
-using Repository.Repositories.Notifications;
-using Service.Services.Notifications;
 
 namespace EKE_Backend
 {
@@ -56,6 +55,8 @@ namespace EKE_Backend
 
 
             //Service
+            services.AddScoped<ITutorService, TutorService>();
+
             services.AddScoped<IBookingService, BookingService>();  
             services.AddScoped<IMatchService, MatchService>();
             services.AddScoped<IUserService, UserService>();
