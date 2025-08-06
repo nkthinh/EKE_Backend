@@ -1,9 +1,5 @@
-﻿using Repository.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using Repository.Enums; // Import để dùng Wallet, PaymentTransaction
 
 namespace Repository.Entities
 {
@@ -30,5 +26,9 @@ namespace Repository.Entities
         public ICollection<Message> Messages { get; set; } = new List<Message>();
         public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
         public ICollection<AiChatSession> AiChatSessions { get; set; } = new List<AiChatSession>();
+
+        // 🔁 PayOS Integration
+        public Wallet? Wallet { get; set; }
+        public ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>();
     }
 }

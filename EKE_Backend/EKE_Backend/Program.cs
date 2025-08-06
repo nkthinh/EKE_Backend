@@ -1,4 +1,5 @@
 using EKE_Backend;
+using EKE_Backend.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -11,7 +12,9 @@ namespace EKE_Backend
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);          
+            var builder = WebApplication.CreateBuilder(args);
+            // Cấu hình URLs để lắng nghe trên tất cả IP
+            builder.WebHost.UseUrls("http://0.0.0.0:5195", "https://0.0.0.0:7103");
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddDbContext<ApplicationDbContext>();
@@ -53,7 +56,7 @@ namespace EKE_Backend
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new() { Title = "IBTSS API", Version = "v1" });
-
+                options.OperationFilter<FileUploadOperationFilter>();
                 // JWT Bearer configuration for Swagger
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {

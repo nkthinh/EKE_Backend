@@ -17,5 +17,7 @@ namespace Repository.Repositories.Tutors
         Task<bool> TutorHasSubjectAsync(long tutorId, long subjectId);
         Task<IEnumerable<long>> GetTutorIdsBySubjectAsync(long subjectId);
         Task RemoveAllByTutorIdAsync(long tutorId);
+        Task<TutorSubject?> GetByTutorAndSubjectIdAsync(long tutorId, long subjectId);
+      
     }
 }

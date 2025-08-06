@@ -55,6 +55,10 @@ namespace Repository
         public DbSet<AiChatSession> AiChatSessions { get; set; }
         public DbSet<AiChatMessage> AiChatMessages { get; set; }
         public DbSet<AppSetting> AppSettings { get; set; }
+        public DbSet<Wallet> Wallets { get; set; }
+        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
+        public DbSet<PayOSWebhook> PayOSWebhooks { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -301,6 +305,40 @@ namespace Repository
                 entity.HasIndex(e => e.KeyName).IsUnique();
                 entity.Property(e => e.KeyName).HasMaxLength(255).IsRequired();
             });
+
+            // Wallet Configuration
+            modelBuilder.Entity<Wallet>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.UserId).IsUnique();
+                entity.Property(e => e.Balance).HasPrecision(18, 2);
+                entity.HasOne(e => e.User)
+                      .WithOne(u => u.Wallet)
+                      .HasForeignKey<Wallet>(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // PaymentTransaction Configuration
+            modelBuilder.Entity<PaymentTransaction>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.OrderCode).IsUnique();
+                entity.Property(e => e.Amount).HasPrecision(18, 2);
+                entity.Property(e => e.Status).HasMaxLength(50);
+                entity.HasOne(e => e.User)
+                      .WithMany(u => u.PaymentTransactions)
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // PayOSWebhook Configuration
+            modelBuilder.Entity<PayOSWebhook>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Payload).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Status).HasMaxLength(50);
+            });
+
 
             // Add Indexes for Performance
             modelBuilder.Entity<User>().HasIndex(e => e.Role);

@@ -74,5 +74,13 @@ namespace Repository.Repositories.Tutors
 
             _dbSet.RemoveRange(tutorSubjects);
         }
+        public async Task<TutorSubject?> GetByTutorAndSubjectIdAsync(long tutorId, long subjectId)
+        {
+            return await _dbSet
+                .Include(ts => ts.Subject)
+                .Include(ts => ts.Tutor)
+                    .ThenInclude(t => t.User)
+                .FirstOrDefaultAsync(ts => ts.TutorId == tutorId && ts.SubjectId == subjectId);
+        }
     }
 }

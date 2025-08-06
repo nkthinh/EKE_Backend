@@ -87,5 +87,28 @@ namespace Repository.Repositories.Tutors
                 .OrderByDescending(t => t.AverageRating)
                 .ToListAsync();
         }
+        public async Task<IEnumerable<Tutor>> GetAvailableTutorsForMatchingAsync(long studentId, IEnumerable<long> excludedTutorIds, int count)
+        {
+            var query = _dbSet
+                .Include(t => t.User)
+                .Include(t => t.TutorSubjects)
+                    .ThenInclude(ts => ts.Subject)
+                .Where(t => t.User.IsActive &&
+                           t.VerificationStatus == VerificationStatus.Verified);
+
+            if (excludedTutorIds.Any())
+            {
+                query = query.Where(t => !excludedTutorIds.Contains(t.Id));
+            }
+
+            return await query
+                .OrderByDescending(t => t.AverageRating)
+                .ThenByDescending(t => t.TotalReviews)
+                .Take(count)
+                .ToListAsync();
+        }
+
+
     }
+
 }

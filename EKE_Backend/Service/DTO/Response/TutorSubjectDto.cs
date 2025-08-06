@@ -13,18 +13,12 @@ namespace Service.DTO.Response
         public long TutorId { get; set; }
         public long SubjectId { get; set; }
         public ProficiencyLevel ProficiencyLevel { get; set; }
-        public string ProficiencyLevelText => ProficiencyLevel switch
-        {
-            ProficiencyLevel.Beginner => "Cơ bản",
-            ProficiencyLevel.Intermediate => "Trung bình",
-            ProficiencyLevel.Advanced => "Nâng cao",
-            ProficiencyLevel.Expert => "Chuyên gia",
-            _ => "Không xác định"
-        };
         public int YearsExperience { get; set; }
-        public string SubjectName { get; set; } = string.Empty;
-        public string? SubjectCode { get; set; }
-        public string? SubjectCategory { get; set; }
-        public string? SubjectIcon { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
+        // Navigation properties
+        public SubjectResponseDto Subject { get; set; } = null!;
     }
+ 
 }

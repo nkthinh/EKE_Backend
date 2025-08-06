@@ -32,7 +32,9 @@ namespace Repository.Enums
     {
         Active = 1,
         Inactive = 2,
-        Blocked = 3
+        Blocked = 3,
+        Pending=4,
+        Rejected = 5
     }
 
     public enum MessageType
@@ -59,14 +61,7 @@ namespace Repository.Enums
         PublicPlace = 4
     }
 
-    public enum NotificationType
-    {
-        Match = 1,
-        Message = 2,
-        Booking = 3,
-        Review = 4,
-        System = 5
-    }
+ 
 
     public enum VerificationStatus
     {
@@ -95,6 +90,61 @@ namespace Repository.Enums
     {
         User = 1,
         Ai = 2
+    }
+    public enum PaymentMethod
+    {
+        Wallet = 1,      // Ví nội bộ
+        VNPay = 2,       // VNPay
+        Momo = 3,        // Momo
+        BankTransfer = 4, // Chuyển khoản ngân hàng
+        Cash = 5         // Tiền mặt (cho offline)
+    }
+
+    public enum PaymentStatus
+    {
+        Pending = 1,     // Đang chờ xử lý
+        Processing = 2,   // Đang xử lý
+        Completed = 3,    // Hoàn thành
+        Failed = 4,       // Thất bại
+        Cancelled = 5,    // Đã hủy
+        Refunded = 6      // Đã hoàn tiền
+    }
+
+    public enum TransactionType
+    {
+        Deposit = 1,      // Nạp tiền
+        Withdraw = 2,     // Rút tiền
+        Payment = 3,      // Thanh toán
+        Refund = 4,       // Hoàn tiền
+        Commission = 5,   // Hoa hồng
+        Transfer = 6,     // Chuyển tiền
+        Bonus = 7,        // Thưởng
+        Penalty = 8       // Phạt
+    }
+
+    public enum TransactionStatus
+    {
+        Pending = 1,      // Đang chờ
+        Completed = 2,    // Hoàn thành
+        Failed = 3,       // Thất bại
+        Cancelled = 4     // Đã hủy
+    }
+
+    public enum NotificationType
+    {
+        BookingCreated = 1,
+        BookingConfirmed = 2,
+        BookingCancelled = 3,
+        BookingCompleted = 4,
+        BookingReminder = 5,
+        PaymentReceived = 6,
+        PaymentFailed = 7,
+        ReviewReceived = 8,
+        TutorVerified = 9,
+        MessageReceived = 10,
+        MatchFound = 11,
+        SystemAnnouncement = 12,
+        PromotionAlert = 13
     }
 }
 

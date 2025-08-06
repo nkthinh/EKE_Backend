@@ -20,7 +20,7 @@ namespace Repository.Repositories.BaseRepository
             _dbSet = context.Set<T>();
         }
 
-        public virtual async Task<T?> GetByIdAsync(long id)
+        public virtual async Task<T> GetByIdAsync(long id)
         {
             return await _dbSet.FindAsync(id);
         }
@@ -35,7 +35,7 @@ namespace Repository.Repositories.BaseRepository
             return await _dbSet.Where(predicate).ToListAsync();
         }
 
-        public virtual async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
+        public virtual async Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
         {
             return await _dbSet.FirstOrDefaultAsync(predicate);
         }
@@ -71,6 +71,18 @@ namespace Repository.Repositories.BaseRepository
         public virtual void RemoveRange(IEnumerable<T> entities)
         {
             _dbSet.RemoveRange(entities);
+        }
+
+        // Additional method for Remove by ID if needed
+        public virtual async Task<bool> RemoveByIdAsync(long id)
+        {
+            var entity = await GetByIdAsync(id);
+            if (entity != null)
+            {
+                Remove(entity);
+                return true;
+            }
+            return false;
         }
 
         public virtual async Task<int> CountAsync()
@@ -109,5 +121,7 @@ namespace Repository.Repositories.BaseRepository
                 .Take(pageSize)
                 .ToListAsync();
         }
+
+
     }
 }

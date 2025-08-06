@@ -1,4 +1,5 @@
-﻿using Repository.Enums;
+﻿using Microsoft.AspNetCore.Http;
+using Repository.Enums;
 using Service.DTO.Request;
 using Service.DTO.Response;
 using System;
@@ -47,5 +48,7 @@ namespace Service.Services.Users
         // Statistics
         Task<UserStatsDto> GetUserStatsAsync();
         Task<UserDashboardDto> GetUserDashboardAsync(long userId);
+        // Thêm vào IUserService
+        Task<string> UploadProfileImageAsync(long userId, IFormFile imageFile);
     }
 }

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Repository.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDB : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,6 +28,22 @@ namespace Repository.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AppSettings", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PayOSWebhooks",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Payload = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PayOSWebhooks", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -62,7 +78,7 @@ namespace Repository.Migrations
                     Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Gender = table.Column<int>(type: "int", nullable: true),
-                    Role = table.Column<int>(type: "int", nullable: false),
+                    Role = table.Column<int>(type: "int", nullable: true),
                     ProfileImage = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
@@ -130,6 +146,35 @@ namespace Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PaymentTransactions",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    OrderCode = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PaymentUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    QRCodeUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PayOSTransactionId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PayOSResponse = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    PaidAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PaymentTransactions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Students",
                 columns: table => new
                 {
@@ -186,6 +231,28 @@ namespace Repository.Migrations
                     table.PrimaryKey("PK_Tutors", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Tutors_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Wallets",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Wallets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Wallets_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -461,10 +528,10 @@ namespace Repository.Migrations
                 columns: new[] { "Id", "CreatedAt", "Description", "KeyName", "UpdatedAt", "Value" },
                 values: new object[,]
                 {
-                    { 1L, new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3752), "Số lần swipe tối đa mỗi ngày", "max_swipes_per_day", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3753), "50" },
-                    { 2L, new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3755), "Rating tối thiểu để hiển thị gia sư", "min_tutor_rating", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3756), "3.0" },
-                    { 3L, new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3758), "Số lần super like mỗi ngày", "super_like_limit", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3758), "5" },
-                    { 4L, new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3760), "Bật/tắt tính năng chat AI", "chat_ai_enabled", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3760), "true" }
+                    { 1L, new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6344), "Số lần swipe tối đa mỗi ngày", "max_swipes_per_day", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6344), "50" },
+                    { 2L, new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6346), "Rating tối thiểu để hiển thị gia sư", "min_tutor_rating", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6346), "3.0" },
+                    { 3L, new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6348), "Số lần super like mỗi ngày", "super_like_limit", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6348), "5" },
+                    { 4L, new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6349), "Bật/tắt tính năng chat AI", "chat_ai_enabled", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6349), "true" }
                 });
 
             migrationBuilder.InsertData(
@@ -472,14 +539,14 @@ namespace Repository.Migrations
                 columns: new[] { "Id", "Category", "Code", "CreatedAt", "Description", "Icon", "IsActive", "Name", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1L, "Khoa học tự nhiên", "MATH", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3515), null, null, true, "Toán học", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3515) },
-                    { 2L, "Khoa học tự nhiên", "PHYSICS", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3517), null, null, true, "Vật lý", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3518) },
-                    { 3L, "Khoa học tự nhiên", "CHEMISTRY", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3520), null, null, true, "Hóa học", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3520) },
-                    { 4L, "Khoa học tự nhiên", "BIOLOGY", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3522), null, null, true, "Sinh học", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3522) },
-                    { 5L, "Khoa học xã hội", "LITERATURE", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3524), null, null, true, "Văn học", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3525) },
-                    { 6L, "Ngoại ngữ", "ENGLISH", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3526), null, null, true, "Tiếng Anh", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3527) },
-                    { 7L, "Khoa học xã hội", "HISTORY", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3529), null, null, true, "Lịch sử", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3529) },
-                    { 8L, "Khoa học xã hội", "GEOGRAPHY", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3531), null, null, true, "Địa lý", new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3531) }
+                    { 1L, "Khoa học tự nhiên", "MATH", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6243), null, null, true, "Toán học", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6244) },
+                    { 2L, "Khoa học tự nhiên", "PHYSICS", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6246), null, null, true, "Vật lý", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6246) },
+                    { 3L, "Khoa học tự nhiên", "CHEMISTRY", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6247), null, null, true, "Hóa học", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6248) },
+                    { 4L, "Khoa học tự nhiên", "BIOLOGY", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6249), null, null, true, "Sinh học", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6250) },
+                    { 5L, "Khoa học xã hội", "LITERATURE", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6251), null, null, true, "Văn học", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6251) },
+                    { 6L, "Ngoại ngữ", "ENGLISH", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6253), null, null, true, "Tiếng Anh", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6253) },
+                    { 7L, "Khoa học xã hội", "HISTORY", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6254), null, null, true, "Lịch sử", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6254) },
+                    { 8L, "Khoa học xã hội", "GEOGRAPHY", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6256), null, null, true, "Địa lý", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6256) }
                 });
 
             migrationBuilder.CreateIndex(
@@ -571,6 +638,17 @@ namespace Repository.Migrations
                 columns: new[] { "UserId", "IsRead", "CreatedAt" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_PaymentTransactions_OrderCode",
+                table: "PaymentTransactions",
+                column: "OrderCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentTransactions_UserId",
+                table: "PaymentTransactions",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reviews_StudentId",
                 table: "Reviews",
                 column: "StudentId");
@@ -652,6 +730,12 @@ namespace Repository.Migrations
                 name: "IX_Users_Role",
                 table: "Users",
                 column: "Role");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Wallets_UserId",
+                table: "Wallets",
+                column: "UserId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -676,6 +760,12 @@ namespace Repository.Migrations
                 name: "Notifications");
 
             migrationBuilder.DropTable(
+                name: "PaymentTransactions");
+
+            migrationBuilder.DropTable(
+                name: "PayOSWebhooks");
+
+            migrationBuilder.DropTable(
                 name: "Reviews");
 
             migrationBuilder.DropTable(
@@ -683,6 +773,9 @@ namespace Repository.Migrations
 
             migrationBuilder.DropTable(
                 name: "TutorSubjects");
+
+            migrationBuilder.DropTable(
+                name: "Wallets");
 
             migrationBuilder.DropTable(
                 name: "AiChatSessions");

@@ -1,14 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using Repository;
 using Repository.Entities;
+using Repository.Repositories;
+using Repository.Repositories.Certifications;
+using Repository.Repositories.Conversations;
+using Repository.Repositories.Matches;
+using Repository.Repositories.Messages;
+using Repository.Repositories.Notifications;
+using Repository.Repositories.Reviews;
 using Repository.Repositories.Students;
+using Repository.Repositories.Subjects;
+using Repository.Repositories.SwipeActions;
 using Repository.Repositories.Tutors;
 using Repository.Repositories.Users;
 using System;
-
+using IMatchRepository = Repository.Repositories.Matches.IMatchRepository;
 
 namespace Repository.UnitOfWork
-    {
+{
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _context;
@@ -19,6 +28,15 @@ namespace Repository.UnitOfWork
         private IStudentRepository? _students;
         private ITutorRepository? _tutors;
         private ITutorSubjectRepository? _tutorSubjects;
+        private ISubjectRepository? _subjects;
+        private ICertificationRepository? _certifications;
+        private ISwipeActionRepository? _swipeActions;
+        private IMatchRepository? _matches;
+        private IConversationRepository? _conversations;
+        private IMessageRepository? _messages;
+        private IReviewRepository? _reviews;
+        private INotificationRepository? _notifications;
+
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
@@ -29,6 +47,18 @@ namespace Repository.UnitOfWork
         public IStudentRepository Students => _students ??= new StudentRepository(_context);
         public ITutorRepository Tutors => _tutors ??= new TutorRepository(_context);
         public ITutorSubjectRepository TutorSubjects => _tutorSubjects ??= new TutorSubjectRepository(_context);
+        public ISubjectRepository Subjects => _subjects ??= new SubjectRepository(_context);
+        public ICertificationRepository Certifications => _certifications ??= new CertificationRepository(_context);
+        public ISwipeActionRepository SwipeActions => _swipeActions ??= new SwipeActionRepository(_context);
+        public Repositories.Matches.IMatchRepository Matches => _matches ??= new Repositories.Matches.MatchRepository(_context);
+        public IConversationRepository Conversations => _conversations ??= new ConversationRepository(_context);
+        public IMessageRepository Messages => _messages ??= new MessageRepository(_context);
+        public IReviewRepository Reviews => _reviews ??= new ReviewRepository(_context);
+        public INotificationRepository Notifications => _notifications ??= new NotificationRepository(_context);
+
+        private IWalletRepository? _wallets;
+        public IWalletRepository Wallets => _wallets ??= new WalletRepository(_context);
+
         public async Task<int> CompleteAsync()
         {
             try
@@ -100,7 +130,3 @@ namespace Repository.UnitOfWork
         }
     }
 }
-
-
-
-    
