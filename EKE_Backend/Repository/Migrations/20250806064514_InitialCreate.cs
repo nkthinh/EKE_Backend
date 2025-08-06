@@ -67,6 +67,26 @@ namespace Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SubscriptionPackages",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    HasPriorityMatching = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    HasAiAssistant = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    NoAds = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubscriptionPackages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -86,12 +106,19 @@ namespace Repository.Migrations
                     Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsVerified = table.Column<bool>(type: "bit", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    SubscriptionPackageId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_SubscriptionPackages_SubscriptionPackageId",
+                        column: x => x.SubscriptionPackageId,
+                        principalTable: "SubscriptionPackages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -528,10 +555,10 @@ namespace Repository.Migrations
                 columns: new[] { "Id", "CreatedAt", "Description", "KeyName", "UpdatedAt", "Value" },
                 values: new object[,]
                 {
-                    { 1L, new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6344), "Số lần swipe tối đa mỗi ngày", "max_swipes_per_day", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6344), "50" },
-                    { 2L, new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6346), "Rating tối thiểu để hiển thị gia sư", "min_tutor_rating", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6346), "3.0" },
-                    { 3L, new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6348), "Số lần super like mỗi ngày", "super_like_limit", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6348), "5" },
-                    { 4L, new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6349), "Bật/tắt tính năng chat AI", "chat_ai_enabled", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6349), "true" }
+                    { 1L, new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9154), "Số lần swipe tối đa mỗi ngày", "max_swipes_per_day", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9155), "50" },
+                    { 2L, new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9156), "Rating tối thiểu để hiển thị gia sư", "min_tutor_rating", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9157), "3.0" },
+                    { 3L, new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9158), "Số lần super like mỗi ngày", "super_like_limit", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9158), "5" },
+                    { 4L, new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9159), "Bật/tắt tính năng chat AI", "chat_ai_enabled", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9160), "true" }
                 });
 
             migrationBuilder.InsertData(
@@ -539,14 +566,14 @@ namespace Repository.Migrations
                 columns: new[] { "Id", "Category", "Code", "CreatedAt", "Description", "Icon", "IsActive", "Name", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1L, "Khoa học tự nhiên", "MATH", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6243), null, null, true, "Toán học", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6244) },
-                    { 2L, "Khoa học tự nhiên", "PHYSICS", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6246), null, null, true, "Vật lý", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6246) },
-                    { 3L, "Khoa học tự nhiên", "CHEMISTRY", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6247), null, null, true, "Hóa học", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6248) },
-                    { 4L, "Khoa học tự nhiên", "BIOLOGY", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6249), null, null, true, "Sinh học", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6250) },
-                    { 5L, "Khoa học xã hội", "LITERATURE", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6251), null, null, true, "Văn học", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6251) },
-                    { 6L, "Ngoại ngữ", "ENGLISH", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6253), null, null, true, "Tiếng Anh", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6253) },
-                    { 7L, "Khoa học xã hội", "HISTORY", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6254), null, null, true, "Lịch sử", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6254) },
-                    { 8L, "Khoa học xã hội", "GEOGRAPHY", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6256), null, null, true, "Địa lý", new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6256) }
+                    { 1L, "Khoa học tự nhiên", "MATH", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9055), null, null, true, "Toán học", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9055) },
+                    { 2L, "Khoa học tự nhiên", "PHYSICS", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9057), null, null, true, "Vật lý", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9057) },
+                    { 3L, "Khoa học tự nhiên", "CHEMISTRY", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9059), null, null, true, "Hóa học", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9059) },
+                    { 4L, "Khoa học tự nhiên", "BIOLOGY", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9061), null, null, true, "Sinh học", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9061) },
+                    { 5L, "Khoa học xã hội", "LITERATURE", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9062), null, null, true, "Văn học", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9063) },
+                    { 6L, "Ngoại ngữ", "ENGLISH", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9064), null, null, true, "Tiếng Anh", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9065) },
+                    { 7L, "Khoa học xã hội", "HISTORY", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9066), null, null, true, "Lịch sử", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9066) },
+                    { 8L, "Khoa học xã hội", "GEOGRAPHY", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9068), null, null, true, "Địa lý", new DateTime(2025, 8, 6, 6, 45, 14, 317, DateTimeKind.Utc).AddTicks(9068) }
                 });
 
             migrationBuilder.CreateIndex(
@@ -732,6 +759,11 @@ namespace Repository.Migrations
                 column: "Role");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_SubscriptionPackageId",
+                table: "Users",
+                column: "SubscriptionPackageId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Wallets_UserId",
                 table: "Wallets",
                 column: "UserId",
@@ -797,6 +829,9 @@ namespace Repository.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "SubscriptionPackages");
         }
     }
 }

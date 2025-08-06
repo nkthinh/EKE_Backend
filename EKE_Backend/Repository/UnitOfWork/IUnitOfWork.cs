@@ -4,6 +4,7 @@ using Repository.Repositories.Conversations;
 using Repository.Repositories.Matches;
 using Repository.Repositories.Messages;
 using Repository.Repositories.Notifications;
+using Repository.Repositories.Repository.Repositories.SubscriptionPackages;
 using Repository.Repositories.Reviews;
 using Repository.Repositories.Students;
 using Repository.Repositories.Subjects;
@@ -30,6 +31,8 @@ namespace Repository.UnitOfWork
         INotificationRepository Notifications { get; }
 
         IWalletRepository Wallets { get; }
+
+        ISubscriptionPackageRepository SubscriptionPackages { get; }
 
 
 

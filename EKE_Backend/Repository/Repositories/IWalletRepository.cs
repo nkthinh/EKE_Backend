@@ -12,6 +12,8 @@ namespace Repository.Repositories
     public interface IWalletRepository : IBaseRepository<Wallet>
     {
         Task<Wallet> GetWalletWithUserAsync(long id);
+
+        Task<Wallet?> GetByUserIdAsync(long userId);
     }
 
 }

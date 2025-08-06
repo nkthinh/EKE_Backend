@@ -58,6 +58,8 @@ namespace Repository
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<PayOSWebhook> PayOSWebhooks { get; set; }
+        public DbSet<SubscriptionPackage> SubscriptionPackages { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -75,6 +77,11 @@ namespace Repository
                 entity.Property(e => e.ProfileImage).HasMaxLength(500);
                 entity.Property(e => e.City).HasMaxLength(100);
                 entity.Property(e => e.District).HasMaxLength(100);
+                entity.HasOne(u => u.SubscriptionPackage)
+                .WithMany(p => p.Users)
+                .HasForeignKey(u => u.SubscriptionPackageId)
+                .OnDelete(DeleteBehavior.SetNull); // Nếu gói bị xoá, user sẽ có SubscriptionPackageId = null
+
             });
 
             // Student Configuration
@@ -338,6 +345,28 @@ namespace Repository
                 entity.Property(e => e.Payload).HasColumnType("nvarchar(max)");
                 entity.Property(e => e.Status).HasMaxLength(50);
             });
+
+            modelBuilder.Entity<SubscriptionPackage>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.Price)
+                    .HasPrecision(10, 2);
+
+                // Optional: default values (nếu muốn)
+                entity.Property(e => e.HasPriorityMatching).HasDefaultValue(false);
+                entity.Property(e => e.HasAiAssistant).HasDefaultValue(false);
+                entity.Property(e => e.NoAds).HasDefaultValue(false);
+            });
+
+
 
 
             // Add Indexes for Performance

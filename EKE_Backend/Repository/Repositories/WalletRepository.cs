@@ -13,4 +13,10 @@ public class WalletRepository : BaseRepository<Wallet>, IWalletRepository
     {
         return await _dbSet.Include(w => w.User).FirstOrDefaultAsync(w => w.Id == id);
     }
+
+    public async Task<Wallet?> GetByUserIdAsync(long userId)
+    {
+        return await _dbSet.FirstOrDefaultAsync(w => w.UserId == userId);
+    }
+
 }

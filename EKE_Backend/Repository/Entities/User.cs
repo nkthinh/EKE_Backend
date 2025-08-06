@@ -30,5 +30,9 @@ namespace Repository.Entities
         // 🔁 PayOS Integration
         public Wallet? Wallet { get; set; }
         public ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>();
+
+        public long? SubscriptionPackageId { get; set; }  // Gói hiện tại
+        public SubscriptionPackage? SubscriptionPackage { get; set; }
+
     }
 }
