@@ -35,7 +35,8 @@ namespace Service.Services.Tutors
             try
             {
                 var (tutors, totalCount) = await _tutorRepository.SearchTutorsAsync(searchParams.Keyword, searchParams.Page, searchParams.PageSize);
-                var tutorDtos = _mapper.Map<IEnumerable<TutorSearchResultDto>>(tutors);
+                var tutorDtos = _mapper.Map<IEnumerable<TutorSearchResultDto>>(tutors); // Ánh xạ từ Tutor sang TutorSearchResultDto
+
                 return (tutorDtos, totalCount);
             }
             catch (Exception ex)
@@ -44,6 +45,9 @@ namespace Service.Services.Tutors
                 throw;
             }
         }
+
+
+
 
         public async Task<TutorProfileDto?> GetTutorProfileAsync(long tutorId)
         {

@@ -127,7 +127,7 @@ namespace Repository.Repositories.Tutors
         public async Task<(IEnumerable<Tutor> Tutors, int TotalCount)> SearchTutorsAsync(string keyword, int page, int pageSize)
         {
             var query = _dbSet
-                .Include(t => t.User)
+                .Include(t => t.User)  // Bao gồm cả thông tin User
                 .Include(t => t.TutorSubjects)
                     .ThenInclude(ts => ts.Subject)
                 .AsQueryable();
@@ -145,6 +145,7 @@ namespace Repository.Repositories.Tutors
 
             return (tutors, totalCount);
         }
+
 
         public async Task<string> UpdateTutorAvailabilityAsync(long tutorId, string availability)
         {

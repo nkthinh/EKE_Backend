@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Repository;
+using Service.Mapping;
 using System.Text;
 
 namespace EKE_Backend
@@ -19,7 +20,8 @@ namespace EKE_Backend
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddDbContext<ApplicationDbContext>();
             // APPLICATION SERVICES (Database, Repository, Services, AutoMapper)      
-            builder.Services.AddApplicationServices(builder.Configuration);      
+            builder.Services.AddApplicationServices(builder.Configuration);
+            builder.Services.AddAutoMapper(typeof(UserMappingProfile));
             // AUTHENTICATION & AUTHORIZATION       
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>

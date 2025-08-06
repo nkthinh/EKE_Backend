@@ -23,7 +23,6 @@ namespace EKE_Backend.Controllers
         /// Search tutors with advanced filters
         /// </summary>
         /// <param name="searchParams">Search parameters</param>
-        /// <returns>List of tutors matching the criteria</returns>
         [HttpGet("search")]
         [AllowAnonymous]
         public async Task<IActionResult> SearchTutors([FromQuery] TutorSearchDto searchParams)
@@ -32,10 +31,21 @@ namespace EKE_Backend.Controllers
             {
                 var (tutors, totalCount) = await _tutorService.SearchTutorsAsync(searchParams);
 
+                // Đảm bảo dữ liệu trả về từ TutorSearchResultDto
                 var response = new
                 {
                     success = true,
-                    data = tutors,
+                    data = tutors.Select(tutor => new
+                    {
+                        tutor.Id,
+                        tutor.UserId,  // Đảm bảo lấy UserId từ Tutor
+                        tutor.FullName,
+                        tutor.ProfileImage,  // Lấy ProfileImage từ DTO
+                        tutor.City,
+                        tutor.District,
+                        tutor.AverageRating,
+                        tutor.TotalReviews
+                    }),
                     filters = searchParams,
                     pagination = new
                     {
@@ -53,6 +63,8 @@ namespace EKE_Backend.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
+
+
 
         /// <summary>
         /// Get tutor profile by ID
@@ -529,7 +541,7 @@ namespace EKE_Backend.Controllers
         /// <param name="status">Filter by verification status (optional)</param>
         /// <returns>List of all tutors</returns>
         [HttpGet("all")]
-        [Authorize(Roles = "Admin")]
+     
         public async Task<IActionResult> GetAllTutors(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20,
