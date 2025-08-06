@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using Repository;
 using Repository.Entities;
+using Repository.Repositories;
 using Repository.Repositories.Certifications;
 using Repository.Repositories.Conversations;
 using Repository.Repositories.Matches;
@@ -13,6 +14,7 @@ using Repository.Repositories.SwipeActions;
 using Repository.Repositories.Tutors;
 using Repository.Repositories.Users;
 using System;
+using IMatchRepository = Repository.Repositories.Matches.IMatchRepository;
 
 namespace Repository.UnitOfWork
 {
@@ -48,11 +50,14 @@ namespace Repository.UnitOfWork
         public ISubjectRepository Subjects => _subjects ??= new SubjectRepository(_context);
         public ICertificationRepository Certifications => _certifications ??= new CertificationRepository(_context);
         public ISwipeActionRepository SwipeActions => _swipeActions ??= new SwipeActionRepository(_context);
-        public IMatchRepository Matches => _matches ??= new MatchRepository(_context);
+        public Repositories.Matches.IMatchRepository Matches => _matches ??= new Repositories.Matches.MatchRepository(_context);
         public IConversationRepository Conversations => _conversations ??= new ConversationRepository(_context);
         public IMessageRepository Messages => _messages ??= new MessageRepository(_context);
         public IReviewRepository Reviews => _reviews ??= new ReviewRepository(_context);
         public INotificationRepository Notifications => _notifications ??= new NotificationRepository(_context);
+
+        private IWalletRepository? _wallets;
+        public IWalletRepository Wallets => _wallets ??= new WalletRepository(_context);
 
         public async Task<int> CompleteAsync()
         {

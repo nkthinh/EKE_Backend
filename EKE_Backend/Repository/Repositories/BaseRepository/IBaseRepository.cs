@@ -21,7 +21,8 @@ namespace Repository.Repositories.BaseRepository
         void UpdateRange(IEnumerable<T> entities);
         void Remove(T entity);
         void RemoveRange(IEnumerable<T> entities);
-      
+        Task<bool> RemoveByIdAsync(long id);
+
         // Query & Count
         Task<int> CountAsync();
         Task<int> CountAsync(Expression<Func<T, bool>> predicate);

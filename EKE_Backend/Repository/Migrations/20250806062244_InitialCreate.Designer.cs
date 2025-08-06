@@ -12,8 +12,8 @@ using Repository;
 namespace Repository.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250612155245_CreateDB")]
-    partial class CreateDB
+    [Migration("20250806062244_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -130,37 +130,37 @@ namespace Repository.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3752),
+                            CreatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6344),
                             Description = "Số lần swipe tối đa mỗi ngày",
                             KeyName = "max_swipes_per_day",
-                            UpdatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3753),
+                            UpdatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6344),
                             Value = "50"
                         },
                         new
                         {
                             Id = 2L,
-                            CreatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3755),
+                            CreatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6346),
                             Description = "Rating tối thiểu để hiển thị gia sư",
                             KeyName = "min_tutor_rating",
-                            UpdatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3756),
+                            UpdatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6346),
                             Value = "3.0"
                         },
                         new
                         {
                             Id = 3L,
-                            CreatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3758),
+                            CreatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6348),
                             Description = "Số lần super like mỗi ngày",
                             KeyName = "super_like_limit",
-                            UpdatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3758),
+                            UpdatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6348),
                             Value = "5"
                         },
                         new
                         {
                             Id = 4L,
-                            CreatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3760),
+                            CreatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6349),
                             Description = "Bật/tắt tính năng chat AI",
                             KeyName = "chat_ai_enabled",
-                            UpdatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3760),
+                            UpdatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6349),
                             Value = "true"
                         });
                 });
@@ -433,6 +433,93 @@ namespace Repository.Migrations
                     b.ToTable("Notifications");
                 });
 
+            modelBuilder.Entity("Repository.Entities.PayOSWebhook", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PayOSWebhooks");
+                });
+
+            modelBuilder.Entity("Repository.Entities.PaymentTransaction", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OrderCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PayOSResponse")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PayOSTransactionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QRCodeUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderCode")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PaymentTransactions");
+                });
+
             modelBuilder.Entity("Repository.Entities.Review", b =>
                 {
                     b.Property<long>("Id")
@@ -579,80 +666,80 @@ namespace Repository.Migrations
                             Id = 1L,
                             Category = "Khoa học tự nhiên",
                             Code = "MATH",
-                            CreatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3515),
+                            CreatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6243),
                             IsActive = true,
                             Name = "Toán học",
-                            UpdatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3515)
+                            UpdatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6244)
                         },
                         new
                         {
                             Id = 2L,
                             Category = "Khoa học tự nhiên",
                             Code = "PHYSICS",
-                            CreatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3517),
+                            CreatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6246),
                             IsActive = true,
                             Name = "Vật lý",
-                            UpdatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3518)
+                            UpdatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6246)
                         },
                         new
                         {
                             Id = 3L,
                             Category = "Khoa học tự nhiên",
                             Code = "CHEMISTRY",
-                            CreatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3520),
+                            CreatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6247),
                             IsActive = true,
                             Name = "Hóa học",
-                            UpdatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3520)
+                            UpdatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6248)
                         },
                         new
                         {
                             Id = 4L,
                             Category = "Khoa học tự nhiên",
                             Code = "BIOLOGY",
-                            CreatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3522),
+                            CreatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6249),
                             IsActive = true,
                             Name = "Sinh học",
-                            UpdatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3522)
+                            UpdatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6250)
                         },
                         new
                         {
                             Id = 5L,
                             Category = "Khoa học xã hội",
                             Code = "LITERATURE",
-                            CreatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3524),
+                            CreatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6251),
                             IsActive = true,
                             Name = "Văn học",
-                            UpdatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3525)
+                            UpdatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6251)
                         },
                         new
                         {
                             Id = 6L,
                             Category = "Ngoại ngữ",
                             Code = "ENGLISH",
-                            CreatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3526),
+                            CreatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6253),
                             IsActive = true,
                             Name = "Tiếng Anh",
-                            UpdatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3527)
+                            UpdatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6253)
                         },
                         new
                         {
                             Id = 7L,
                             Category = "Khoa học xã hội",
                             Code = "HISTORY",
-                            CreatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3529),
+                            CreatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6254),
                             IsActive = true,
                             Name = "Lịch sử",
-                            UpdatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3529)
+                            UpdatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6254)
                         },
                         new
                         {
                             Id = 8L,
                             Category = "Khoa học xã hội",
                             Code = "GEOGRAPHY",
-                            CreatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3531),
+                            CreatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6256),
                             IsActive = true,
                             Name = "Địa lý",
-                            UpdatedAt = new DateTime(2025, 6, 12, 15, 52, 45, 418, DateTimeKind.Utc).AddTicks(3531)
+                            UpdatedAt = new DateTime(2025, 8, 6, 6, 22, 44, 706, DateTimeKind.Utc).AddTicks(6256)
                         });
                 });
 
@@ -862,7 +949,7 @@ namespace Repository.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int>("Role")
+                    b.Property<int?>("Role")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -876,6 +963,35 @@ namespace Repository.Migrations
                     b.HasIndex("Role");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Repository.Entities.Wallet", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Balance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Wallets");
                 });
 
             modelBuilder.Entity("Repository.Entities.AiChatMessage", b =>
@@ -998,6 +1114,17 @@ namespace Repository.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Repository.Entities.PaymentTransaction", b =>
+                {
+                    b.HasOne("Repository.Entities.User", "User")
+                        .WithMany("PaymentTransactions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Repository.Entities.Review", b =>
                 {
                     b.HasOne("Repository.Entities.Student", "Student")
@@ -1077,6 +1204,17 @@ namespace Repository.Migrations
                     b.Navigation("Tutor");
                 });
 
+            modelBuilder.Entity("Repository.Entities.Wallet", b =>
+                {
+                    b.HasOne("Repository.Entities.User", "User")
+                        .WithOne("Wallet")
+                        .HasForeignKey("Repository.Entities.Wallet", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Repository.Entities.AiChatSession", b =>
                 {
                     b.Navigation("AiChatMessages");
@@ -1131,9 +1269,13 @@ namespace Repository.Migrations
 
                     b.Navigation("Notifications");
 
+                    b.Navigation("PaymentTransactions");
+
                     b.Navigation("Student");
 
                     b.Navigation("Tutor");
+
+                    b.Navigation("Wallet");
                 });
 #pragma warning restore 612, 618
         }

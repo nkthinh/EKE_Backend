@@ -1,4 +1,5 @@
-﻿using Repository.Repositories.Certifications;
+﻿using Repository.Repositories;
+using Repository.Repositories.Certifications;
 using Repository.Repositories.Conversations;
 using Repository.Repositories.Matches;
 using Repository.Repositories.Messages;
@@ -9,6 +10,7 @@ using Repository.Repositories.Subjects;
 using Repository.Repositories.SwipeActions;
 using Repository.Repositories.Tutors;
 using Repository.Repositories.Users;
+using IMatchRepository = Repository.Repositories.Matches.IMatchRepository;
 
 namespace Repository.UnitOfWork
 {
@@ -26,6 +28,10 @@ namespace Repository.UnitOfWork
         IMessageRepository Messages { get; }
         IReviewRepository Reviews { get; }
         INotificationRepository Notifications { get; }
+
+        IWalletRepository Wallets { get; }
+
+
 
         Task<int> CompleteAsync();
         Task BeginTransactionAsync();
