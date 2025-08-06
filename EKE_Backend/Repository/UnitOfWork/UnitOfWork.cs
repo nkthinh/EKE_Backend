@@ -7,6 +7,7 @@ using Repository.Repositories.Conversations;
 using Repository.Repositories.Matches;
 using Repository.Repositories.Messages;
 using Repository.Repositories.Notifications;
+using Repository.Repositories.Repository.Repositories.SubscriptionPackages;
 using Repository.Repositories.Reviews;
 using Repository.Repositories.Students;
 using Repository.Repositories.Subjects;
@@ -58,6 +59,9 @@ namespace Repository.UnitOfWork
 
         private IWalletRepository? _wallets;
         public IWalletRepository Wallets => _wallets ??= new WalletRepository(_context);
+        private ISubscriptionPackageRepository? _subscriptionPackages;
+
+        public ISubscriptionPackageRepository SubscriptionPackages => _subscriptionPackages ??= new SubscriptionPackageRepository(_context);
 
         public async Task<int> CompleteAsync()
         {
