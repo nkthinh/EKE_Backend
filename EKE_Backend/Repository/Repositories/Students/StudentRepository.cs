@@ -41,6 +41,11 @@ namespace Repository.Repositories.Students
                 .Include(s => s.User)
                 .FirstOrDefaultAsync(s => s.UserId == userId);
         }
-      
+        public async Task UpdateAsync(Student student)
+        {
+            _dbSet.Update(student); // Cập nhật entity Student
+            await _context.SaveChangesAsync(); // Lưu thay đổi vào cơ sở dữ liệu
+        }
+
     }
 }

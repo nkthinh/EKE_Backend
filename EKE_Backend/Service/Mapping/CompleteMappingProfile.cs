@@ -59,8 +59,11 @@ namespace Service.Mapping
 
             // Tutor mappings
             CreateMap<Tutor, TutorResponseDto>()
-                .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
-                .ForMember(dest => dest.Subjects, opt => opt.MapFrom(src => src.TutorSubjects));
+          .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))  // Lấy UserId từ Tutor
+          .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))  // Lấy FullName từ User
+          .ForMember(dest => dest.ProfileImage, opt => opt.MapFrom(src => src.User.ProfileImage))  // Lấy ProfileImage từ User
+          .ForMember(dest => dest.Subjects, opt => opt.MapFrom(src => src.TutorSubjects));  // Lấy TutorSubjects
+
 
             CreateMap<Tutor, TutorSearchResultDto>()
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))

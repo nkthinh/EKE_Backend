@@ -1,4 +1,5 @@
-﻿using Service.DTO.Request;
+﻿using Repository.Entities;
+using Service.DTO.Request;
 using Service.DTO.Response;
 using System;
 using System.Collections.Generic;
@@ -18,10 +19,9 @@ namespace Service.Services.Messages
         Task<int> GetUnreadMessageCountAsync(long userId);
         Task<IEnumerable<ConversationResponseDto>> GetUserConversationsAsync(long userId);
         Task<bool> DeleteMessageAsync(long messageId, long userId);
-        Task<(IEnumerable<MessageResponseDto> Messages, int TotalCount)> SearchMessagesAsync(long conversationId, string query, int page, int pageSize);
-        Task<MessageStatisticsDto> GetMessageStatisticsAsync();
         Task<bool> IsUserInConversationAsync(long conversationId, long userId);
-        Task<bool> IsUserInMatchAsync(long matchId, long userId);
-        Task<long?> GetRecipientIdAsync(long conversationId, long senderId);
+        Task<(IEnumerable<MessageResponseDto> Messages, int TotalCount)> SearchMessagesAsync(long conversationId, string query, int page, int pageSize);
     }
 }
+
+

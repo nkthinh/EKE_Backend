@@ -145,7 +145,12 @@ namespace Repository.Repositories.Tutors
 
             return (tutors, totalCount);
         }
-
+        public async Task<Tutor?> GetTutotWithUserInfoAsync(long tutorId)
+        {
+            return await _dbSet
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.Id == tutorId);
+        }
 
         public async Task<string> UpdateTutorAvailabilityAsync(long tutorId, string availability)
         {

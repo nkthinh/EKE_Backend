@@ -1,4 +1,5 @@
-﻿using Repository.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Repository.Entities;
 using Repository.Enums;
 using Repository.Repositories.BaseRepository;
 using System;
@@ -23,7 +24,8 @@ namespace Repository.Repositories.Tutors
 
         // Lấy thông tin tutor dựa trên UserId
         Task<Tutor?> GetTutorByUserIdAsync(long userId);
-
+        Task<Tutor?> GetTutotWithUserInfoAsync(long tutorId);
+      
         // Lấy các tutor theo môn học (kèm theo phân trang)
         Task<(IEnumerable<Tutor> Tutors, int TotalCount)> GetTutorsBySubjectAsync(long subjectId, int page, int pageSize);
 

@@ -25,6 +25,13 @@ namespace Service.Mapping
                 .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.Sender.FullName))
                 .ForMember(dest => dest.SenderAvatar, opt => opt.MapFrom(src => src.Sender.ProfileImage))
                 .ForMember(dest => dest.IsMine, opt => opt.Ignore()); // Will be set manually
+            CreateMap<Conversation, ConversationResponseDto>()
+          .ForMember(dest => dest.Partner, opt => opt.Ignore())  // Ignore Partner field for now
+          .ForMember(dest => dest.LastMessage, opt => opt.MapFrom(src => src.LastMessageAt != null ? "Thông tin tin nhắn cuối" : null))
+          .ForMember(dest => dest.LastMessageAt, opt => opt.MapFrom(src => src.LastMessageAt));
+
+            CreateMap<User, UserBasicInfoDto>()
+                .ForMember(dest => dest.IsOnline, opt => opt.MapFrom(src => false)); // Set online status
         }
     }
 }

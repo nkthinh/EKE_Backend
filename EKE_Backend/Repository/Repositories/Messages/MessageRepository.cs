@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Repository.Entities;
 using Repository.Repositories.BaseRepository;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Repository.Repositories.Messages
@@ -20,7 +18,6 @@ namespace Repository.Repositories.Messages
                 .Where(m => m.ConversationId == conversationId);
 
             var totalCount = await query.CountAsync();
-
             var messages = await query
                 .OrderByDescending(m => m.CreatedAt)
                 .Skip((page - 1) * pageSize)
@@ -35,6 +32,38 @@ namespace Repository.Repositories.Messages
             return await _dbSet
                 .Include(m => m.Sender)
                 .FirstOrDefaultAsync(m => m.Id == messageId);
+        }
+
+        public async Task<Message> CreateAsync(Message message)
+        {
+            await _dbSet.AddAsync(message);
+            await _context.SaveChangesAsync();
+            return message;
+        }
+
+        public async Task<bool> DeleteAsync(long messageId)
+        {
+            var message = await _dbSet.FindAsync(messageId);
+            if (message == null) return false;
+
+            _dbSet.Remove(message);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<(IEnumerable<Message> Messages, int TotalCount)> SearchMessagesAsync(long conversationId, string query, int page, int pageSize)
+        {
+            var queryMessages = _dbSet
+                .Where(m => m.ConversationId == conversationId && m.Content.Contains(query))
+                .OrderByDescending(m => m.CreatedAt);
+
+            var totalCount = await queryMessages.CountAsync();
+            var messages = await queryMessages
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (messages, totalCount);
         }
 
         public async Task<int> GetUnreadCountForUserAsync(long conversationId, long userId)
@@ -91,6 +120,14 @@ namespace Repository.Repositories.Messages
             }
 
             _context.UpdateRange(messages);
+        }
+
+        public async Task<bool> IsUserInConversationAsync(long conversationId, long userId)
+        {
+            return await _dbSet
+                .Where(m => m.ConversationId == conversationId &&
+                            (m.SenderId == userId || m.Conversation.Match.Student.UserId == userId || m.Conversation.Match.Tutor.UserId == userId))
+                .AnyAsync();
         }
     }
 }

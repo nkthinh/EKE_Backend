@@ -29,13 +29,23 @@ namespace Service.Services.Tutors
             _mapper = mapper;
             _logger = logger;
         }
-
         public async Task<(IEnumerable<TutorSearchResultDto> Tutors, int TotalCount)> SearchTutorsAsync(TutorSearchDto searchParams)
         {
             try
             {
                 var (tutors, totalCount) = await _tutorRepository.SearchTutorsAsync(searchParams.Keyword, searchParams.Page, searchParams.PageSize);
-                var tutorDtos = _mapper.Map<IEnumerable<TutorSearchResultDto>>(tutors); // Ánh xạ từ Tutor sang TutorSearchResultDto
+
+                var tutorDtos = tutors.Select(tutor => new TutorSearchResultDto
+                {
+                    Id = tutor.Id,
+                    UserId = tutor.UserId,  // Thêm UserId
+                    FullName = tutor.User?.FullName ?? "Unknown",  // Tên đầy đủ từ User
+                    ProfileImage = tutor.User?.ProfileImage,  // Ảnh đại diện từ User
+                    City = tutor.User?.City,  // Thành phố từ User
+                    District = tutor.User?.District,  // Quận từ User
+                    AverageRating = tutor.AverageRating,
+                    TotalReviews = tutor.TotalReviews
+                }).ToList();
 
                 return (tutorDtos, totalCount);
             }
@@ -45,6 +55,7 @@ namespace Service.Services.Tutors
                 throw;
             }
         }
+
 
 
 

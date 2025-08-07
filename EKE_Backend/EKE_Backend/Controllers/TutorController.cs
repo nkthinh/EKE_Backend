@@ -31,16 +31,15 @@ namespace EKE_Backend.Controllers
             {
                 var (tutors, totalCount) = await _tutorService.SearchTutorsAsync(searchParams);
 
-                // Đảm bảo dữ liệu trả về từ TutorSearchResultDto
                 var response = new
                 {
                     success = true,
                     data = tutors.Select(tutor => new
                     {
-                        tutor.Id,
-                        tutor.UserId,  // Đảm bảo lấy UserId từ Tutor
+                        tutor.Id,  // TutorId
+                        tutor.UserId,  // UserId
                         tutor.FullName,
-                        tutor.ProfileImage,  // Lấy ProfileImage từ DTO
+                        tutor.ProfileImage,  // Ảnh đại diện
                         tutor.City,
                         tutor.District,
                         tutor.AverageRating,

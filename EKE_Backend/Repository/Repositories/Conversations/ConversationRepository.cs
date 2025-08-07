@@ -51,5 +51,12 @@ namespace Repository.Repositories.Conversations
                         .ThenInclude(t => t.User)
                 .FirstOrDefaultAsync(c => c.MatchId == matchId);
         }
+        public async Task<Conversation> CreateAsync(Conversation conversation)
+        {
+            await _dbSet.AddAsync(conversation);  // Thêm đối tượng vào DbSet
+            await _context.SaveChangesAsync();  // Lưu thay đổi vào cơ sở dữ liệu
+            return conversation;
+        }
+
     }
 }

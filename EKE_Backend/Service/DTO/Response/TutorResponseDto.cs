@@ -9,8 +9,8 @@ namespace Service.DTO.Response
 {
     public class TutorResponseDto
     {
-        public long Id { get; set; }
-        public long UserId { get; set; }
+        public long Id { get; set; }  // ID của tutor trong bảng Tutor
+        public long UserId { get; set; }  // UserId của tutor từ bảng User
         public int ExperienceYears { get; set; }
         public string? University { get; set; }
         public string? Major { get; set; }
@@ -18,9 +18,14 @@ namespace Service.DTO.Response
         public decimal AverageRating { get; set; }
         public int TotalReviews { get; set; }
         public VerificationStatus VerificationStatus { get; set; }
-        public UserResponseDto User { get; set; } = null!;
-        public ICollection<TutorSubjectDto> Subjects { get; set; } = new List<TutorSubjectDto>();
+        public string? ProfileImage { get; set; }  // Ảnh đại diện của tutor
+        public string FullName { get; set; } // Tên đầy đủ của tutor
+        public ICollection<TutorSubjectDto> Subjects { get; set; } = new List<TutorSubjectDto>(); // Các môn học mà tutor dạy
+
+        // Bạn có thể thêm một số thuộc tính tùy chỉnh nếu cần (ví dụ: IsOnline)
+        public bool IsOnline { get; set; }
     }
+
     public class TutorStatisticsDto
     {
         public int TotalBookings { get; set; }
@@ -49,6 +54,8 @@ namespace Service.DTO.Response
         public int MessagesThisMonth { get; set; }
         public double AverageMessagesPerConversation { get; set; }
         public Dictionary<string, int> MessagesByType { get; set; } = new();
+        public int TotalUsers { get; set; } // Tổng số người dùng
+        public int UnreadMessages { get; set; } // Số tin nhắn chưa đọc
     }
     public class TutorAdminDto
     {

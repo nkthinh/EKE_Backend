@@ -23,5 +23,6 @@ namespace Service.DTO.Request
         public string? Content { get; set; }
         public IFormFile? File { get; set; }
         public MessageType MessageType { get; set; } = MessageType.File;  // Updated property name
+        public string FileUrl { get; set; }
     }
 }

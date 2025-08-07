@@ -41,15 +41,15 @@ namespace Service.DTO.Response
         public UserBasicInfoDto Tutor { get; set; } = null!;
         public ConversationBasicDto? Conversation { get; set; }
     }
-
     public class UserBasicInfoDto
     {
         public long Id { get; set; }
         public string FullName { get; set; } = string.Empty;
-        public string? ProfileImage { get; set; }
-        public bool IsOnline { get; set; }
-        public DateTime? LastSeen { get; set; }
+        public string ProfileImage { get; set; } = string.Empty;  // Optional, nếu có
+        public bool IsOnline { get; set; }  // Trạng thái kết nối real-time
+        public DateTime? LastSeen { get; set; }  // Thời gian người dùng lần cuối online
     }
+
 
     public class ConversationBasicDto
     {

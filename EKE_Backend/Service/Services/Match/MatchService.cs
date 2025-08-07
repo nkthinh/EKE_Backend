@@ -1,8 +1,12 @@
 ﻿using Application.DTOs;
 using Application.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 using Repository.Entities;
 using Repository.Enums;
 using Repository.Repositories;
+using Repository.Repositories.Matches;
+using Repository.Repositories.Students;
+using Repository.Repositories.Tutors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +17,17 @@ namespace Application.Services
     public class MatchService : IMatchService
     {
         private readonly IMatchRepository _matchRepository;
+        private readonly IStudentRepository _studentRepository;
+        private readonly ITutorRepository _tutorRepository;
+        private readonly ILogger<MatchService> _logger;
 
-        public MatchService(IMatchRepository matchRepository)
+        public MatchService(IMatchRepository matchRepository,IStudentRepository studentRepository, ITutorRepository tutorRepository, ILogger<MatchService> logger)
         {
             _matchRepository = matchRepository;
+            _studentRepository = studentRepository;
+            _tutorRepository = tutorRepository;
+            _logger = logger;
+
         }
 
         public async Task<MatchResponseDto> GetByIdAsync(long id)
@@ -36,24 +47,64 @@ namespace Application.Services
 
         public async Task<MatchResponseDto> CreateAsync(MatchRequestDto requestDto)
         {
-            // Check if active match already exists
-            var hasActiveMatch = await _matchRepository.HasActiveMatchAsync(requestDto.StudentId, requestDto.TutorId);
-            if (hasActiveMatch)
-                throw new InvalidOperationException("Active match already exists between this student and tutor");
-
-            var match = new Match
+            try
             {
-                StudentId = requestDto.StudentId,
-                TutorId = requestDto.TutorId,
-                Status = requestDto.Status ?? MatchStatus.Active,
-                MatchedAt = DateTime.UtcNow,
-                LastActivity = DateTime.UtcNow
-            };
+                // Kiểm tra nếu đã có match active
+                _logger.LogInformation("Checking if active match exists for student {StudentId} and tutor {TutorId}", requestDto.StudentId, requestDto.TutorId);
+                var hasActiveMatch = await _matchRepository.HasActiveMatchAsync(requestDto.StudentId, requestDto.TutorId);
+                if (hasActiveMatch)
+                {
+                    _logger.LogWarning("Active match already exists between student {StudentId} and tutor {TutorId}", requestDto.StudentId, requestDto.TutorId);
+                    throw new InvalidOperationException("Active match already exists between this student and tutor");
+                }
 
-            var createdMatch = await _matchRepository.CreateAsync(match);
-            var detailedMatch = await _matchRepository.GetMatchWithDetailsAsync(createdMatch.Id);
-            return MapToResponseDto(detailedMatch);
+                // Kiểm tra sự tồn tại của Student và Tutor
+                _logger.LogInformation("Checking existence of student {StudentId} and tutor {TutorId}", requestDto.StudentId, requestDto.TutorId);
+                var student = await _studentRepository.GetStudentWithUserInfoAsync(requestDto.StudentId);
+                var tutor = await _tutorRepository.GetTutotWithUserInfoAsync(requestDto.TutorId);
+
+                if (student == null)
+                {
+                    _logger.LogError("Student with ID {StudentId} not found", requestDto.StudentId);
+                    throw new KeyNotFoundException($"Student with ID {requestDto.StudentId} not found");
+                }
+                if (tutor == null)
+                {
+                    _logger.LogError("Tutor with ID {TutorId} not found", requestDto.TutorId);
+                    throw new KeyNotFoundException($"Tutor with ID {requestDto.TutorId} not found");
+                }
+
+                // Tạo match mới
+                _logger.LogInformation("Creating new match for student {StudentId} and tutor {TutorId}", requestDto.StudentId, requestDto.TutorId);
+                var match = new Match
+                {
+                    StudentId = requestDto.StudentId,
+                    TutorId = requestDto.TutorId,
+                    Status = requestDto.Status ?? MatchStatus.Active,
+                    MatchedAt = DateTime.UtcNow,
+                    LastActivity = DateTime.UtcNow
+                };
+
+                // Lưu match vào cơ sở dữ liệu
+                _logger.LogInformation("Saving new match to the database");
+                var createdMatch = await _matchRepository.CreateAsync(match);
+
+                // Lấy thông tin match vừa tạo với chi tiết
+                _logger.LogInformation("Fetching detailed match for match ID {MatchId}", createdMatch.Id);
+                var detailedMatch = await _matchRepository.GetMatchWithDetailsAsync(createdMatch.Id);
+
+                _logger.LogInformation("Match created successfully for student {StudentId} and tutor {TutorId}", requestDto.StudentId, requestDto.TutorId);
+
+                return MapToResponseDto(detailedMatch);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating match for student {StudentId} and tutor {TutorId}", requestDto.StudentId, requestDto.TutorId);
+                throw;  // Rethrow the exception after logging it
+            }
         }
+
+
 
         public async Task<MatchResponseDto> UpdateAsync(long id, MatchRequestDto requestDto)
         {

@@ -14,5 +14,6 @@ namespace Repository.Repositories.Students
         Task<IEnumerable<Student>> GetStudentsWithUserInfoAsync();
         Task<Student?> GetStudentByUserIdAsync(long userId);
         Task<Student?> GetByUserIdAsync(long userId);
+        Task UpdateAsync(Student student);
     }
 }

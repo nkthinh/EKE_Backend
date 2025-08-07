@@ -13,5 +13,11 @@ namespace Repository.Repositories.SwipeActions
         Task<IEnumerable<long>> GetSwipedTutorIdsByStudentAsync(long studentId);
         Task<SwipeAction?> GetByStudentAndTutorAsync(long studentId, long tutorId);
         Task<bool> HasStudentSwipedTutorAsync(long studentId, long tutorId);
+        Task<SwipeAction?> GetSwipeActionAsync(long studentId, long tutorId);
+
+        Task<IEnumerable<long>> GetSwipedStudentIdsByTutorAsync(long tutorId);
+        Task<SwipeAction?> GetSwipeActionByStudentAndTutorAsync(long studentId, long tutorId);
+        Task CreateAsync(SwipeAction swipeAction);  // Thêm phương thức CreateAsync
+        Task UpdateAsync(SwipeAction swipeAction);  // Thêm phương thức UpdateAsync
     }
 }

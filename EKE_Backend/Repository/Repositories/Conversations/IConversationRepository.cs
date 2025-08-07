@@ -10,8 +10,9 @@ namespace Repository.Repositories.Conversations
 {
     public interface IConversationRepository : IBaseRepository<Conversation>
     {
+        Task<Conversation?> GetByMatchIdAsync(long matchId);
         Task<IEnumerable<Conversation>> GetUserConversationsAsync(long userId);
         Task<Conversation?> GetConversationWithDetailsAsync(long conversationId);
-        Task<Conversation?> GetByMatchIdAsync(long matchId);
+        Task<Conversation> CreateAsync(Conversation conversation);
     }
 }
