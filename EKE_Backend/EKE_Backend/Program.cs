@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Repository;
 using Service.Mapping;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 using System.Text;
 
 namespace EKE_Backend
@@ -14,15 +16,15 @@ namespace EKE_Backend
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            // Cấu hình URLs để lắng nghe trên tất cả IP
             builder.WebHost.UseUrls("http://0.0.0.0:5195", "https://0.0.0.0:7103");
+
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddDbContext<ApplicationDbContext>();
-            // APPLICATION SERVICES (Database, Repository, Services, AutoMapper)      
             builder.Services.AddApplicationServices(builder.Configuration);
             builder.Services.AddAutoMapper(typeof(UserMappingProfile));
-            // AUTHENTICATION & AUTHORIZATION       
+
+            // AUTHENTICATION
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
@@ -41,7 +43,8 @@ namespace EKE_Backend
                 });
 
             builder.Services.AddAuthorization();
-            // CORS CONFIGURATION 
+
+            // CORS
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
@@ -50,24 +53,25 @@ namespace EKE_Backend
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });
-            });  
-            // SIGNALR       
-            builder.Services.AddSignalR();           
-            // SWAGGER CONFIGURATION
-        
+            });
+
+            builder.Services.AddSignalR();
+
+            // ✅ SWAGGER CONFIGURATION (không cần nhập "Bearer ")
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new() { Title = "IBTSS API", Version = "v1" });
                 options.OperationFilter<FileUploadOperationFilter>();
-                // JWT Bearer configuration for Swagger
+                options.OperationFilter<AutoAppendBearerTokenOperationFilter>(); // 👈 gắn filter tùy chỉnh
+
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
+                    Description = "Chỉ cần nhập JWT token. Không cần chữ 'Bearer '.",
                     Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Description = "Nhập JWT token dạng: Bearer {token}"
+                    Type = SecuritySchemeType.Http, // 🔁 đổi từ ApiKey -> Http
+                    Scheme = "bearer",              // 🔁 bắt buộc phải là lowercase 'bearer'
+                    BearerFormat = "JWT"
                 });
 
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -85,20 +89,57 @@ namespace EKE_Backend
                     }
                 });
             });
+
+            // ✅ Đăng ký filter trong DI container
+            builder.Services.AddTransient<AutoAppendBearerTokenOperationFilter>();
+
             var app = builder.Build();
-     
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
             app.UseCors("AllowAll");
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
-
             app.Run();
+        }
+    }
+
+    // ✅ Filter tùy chỉnh để thêm "Bearer " trước token nếu người dùng không gõ
+    public class AutoAppendBearerTokenOperationFilter : IOperationFilter
+    {
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
+        {
+            if (operation.Security == null)
+                operation.Security = new List<OpenApiSecurityRequirement>();
+
+            operation.Security.Add(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+
+            var authParameter = operation.Parameters?.FirstOrDefault(p => p.Name == "Authorization");
+            if (authParameter != null)
+            {
+                operation.Parameters.Remove(authParameter);
+            }
+
+            // Không cần chỉnh Authorization header tại đây vì Swagger UI sẽ gắn token qua Authorize button
         }
     }
 }

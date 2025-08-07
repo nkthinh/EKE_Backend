@@ -49,7 +49,7 @@ namespace Service.DTO.Request
         public int? ExperienceYears { get; set; }
         public decimal? HourlyRate { get; set; }
         public string? Introduction { get; set; }
-        public List<long> SubjectIds { get; set; } = new List<long>();
+        public List<long>? SubjectIds { get; set; } = new List<long>();
     }
 
     // Response DTO for registration steps
