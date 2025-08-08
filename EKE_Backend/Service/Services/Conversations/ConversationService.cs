@@ -2,6 +2,7 @@
 using Repository.Entities;
 using Repository.Repositories.Conversations;
 using Repository.Repositories.Matches;
+using Repository.Repositories.Messages;
 using Repository.Repositories.Students;
 using Repository.Repositories.Tutors;
 using Service.DTO.Response;
@@ -18,15 +19,17 @@ namespace Service.Services.Conversations
         private readonly IStudentRepository _studentRepository;
         private readonly ITutorRepository _tutorRepository;
         private readonly IMapper _mapper;
+        private readonly IMessageRepository _messageRepository;
 
         public ConversationService(IConversationRepository conversationRepository, IMatchRepository matchRepository, IMapper mapper,
-            IStudentRepository studentRepository, ITutorRepository tutorRepository)
+            IStudentRepository studentRepository, ITutorRepository tutorRepository, IMessageRepository messageRepository)
         {
             _conversationRepository = conversationRepository;
             _matchRepository = matchRepository;
             _studentRepository = studentRepository;
             _tutorRepository = tutorRepository;
             _mapper = mapper;
+            _messageRepository = messageRepository;
         }
 
         public async Task<ConversationResponseDto> GetOrCreateConversationAsync(long matchId)
@@ -69,8 +72,14 @@ namespace Service.Services.Conversations
                 conversationDto.StudentName = student?.User?.FullName ?? "Unknown";  // Tên học sinh
                 conversationDto.TutorName = tutor?.User?.FullName ?? "Unknown";      // Tên gia sư
             }
-
-            conversationDto.LastMessage = "Thông tin tin nhắn cuối cùng";  // Lấy tin nhắn cuối cùng nếu cần
+            // Lấy tin nhắn cuối cùng từ bảng Messages
+            var lastMessage = await _messageRepository.GetLastMessageByConversationIdAsync(conversation.Id);
+            if (lastMessage != null)
+            {
+                conversationDto.LastMessageId = lastMessage.Id;
+                conversationDto.LastMessage = lastMessage.Content;
+                conversationDto.LastMessageAt = lastMessage.CreatedAt;
+            }
 
             return conversationDto;
         }
@@ -81,9 +90,63 @@ namespace Service.Services.Conversations
 
         public async Task<IEnumerable<ConversationResponseDto>> GetUserConversationsAsync(long userId)
         {
-            var conversations = await _conversationRepository.GetUserConversationsAsync(userId);
-            return _mapper.Map<IEnumerable<ConversationResponseDto>>(conversations);
+            var conversations = await _conversationRepository.GetUserConversationsAsync(userId); // Lấy cuộc trò chuyện của người dùng
+
+            var conversationDtos = new List<ConversationResponseDto>();
+
+            foreach (var conversation in conversations)
+            {
+                var conversationDto = _mapper.Map<ConversationResponseDto>(conversation);
+
+                // Kiểm tra nếu MatchId tồn tại
+                if (conversation.MatchId != 0)  // Kiểm tra nếu MatchId hợp lệ
+                {
+                    var match = await _matchRepository.GetByIdAsync(conversation.MatchId);  // Lấy match theo matchId
+
+                    if (match == null)
+                    {
+                        var errorMessage = $"Không tìm thấy Match cho cuộc trò chuyện này. " +
+                                           $"Conversation ID: {conversation.Id}, " +
+                                           $"Match ID: {conversation.MatchId}";
+                        throw new InvalidOperationException(errorMessage);
+                    }
+
+                    // Lấy thông tin StudentId và TutorId từ Match
+                    conversationDto.StudentId = match.StudentId;
+                    conversationDto.TutorId = match.TutorId;
+
+                    // Lấy tên học sinh và gia sư từ bảng User
+                    var student = await _studentRepository.GetStudentWithUserInfoAsync(match.StudentId);  // Lấy thông tin học sinh
+                    var tutor = await _tutorRepository.GetTutorWithDetailsAsync(match.TutorId);            // Lấy thông tin gia sư
+
+                    // Kiểm tra null và lấy tên
+                    conversationDto.StudentName = student?.User?.FullName ?? "Unknown";
+                    conversationDto.TutorName = tutor?.User?.FullName ?? "Unknown";
+                    // Lấy thông tin tin nhắn cuối cùng
+                    var lastMessage = await _messageRepository.GetLastMessageByConversationIdAsync(conversation.Id);
+                    if (lastMessage != null)
+                    {
+                        conversationDto.LastMessageId = lastMessage.Id;
+                        conversationDto.LastMessage = lastMessage.Content;
+                        conversationDto.LastMessageAt = lastMessage.CreatedAt;
+                    }
+                }
+                else
+                {
+                    // Thêm thông báo chi tiết khi không có MatchId
+                    var errorMessage = $"Không tìm thấy MatchId cho cuộc trò chuyện này. " +
+                                       $"Conversation ID: {conversation.Id}, " +
+                                       $"MatchId: {conversation.MatchId}";
+
+                    throw new InvalidOperationException(errorMessage);
+                }
+
+                conversationDtos.Add(conversationDto);
+            }
+
+            return conversationDtos;
         }
+
         public async Task<ConversationResponseDto> GetConversationByIdAsync(long conversationId)
         {
             var conversation = await _conversationRepository.GetByIdAsync(conversationId); // Lấy cuộc trò chuyện theo conversationId
@@ -95,36 +158,54 @@ namespace Service.Services.Conversations
 
             var conversationDto = _mapper.Map<ConversationResponseDto>(conversation);
 
-            // Kiểm tra nếu Match tồn tại
-            if (conversation.Match != null)
+            // Kiểm tra nếu MatchId tồn tại
+            if (conversation.MatchId != 0)  // Kiểm tra nếu MatchId khác 0 (giả sử 0 là giá trị không hợp lệ)
             {
+                var match = await _matchRepository.GetByIdAsync(conversation.MatchId);  // Lấy match theo matchId
+
+                if (match == null)
+                {
+                    // Nếu không tìm thấy Match tương ứng với MatchId
+                    var errorMessage = $"Không tìm thấy Match cho cuộc trò chuyện này. " +
+                                       $"Conversation ID: {conversation.Id}, " +
+                                       $"Match ID: {conversation.MatchId}";
+                    throw new InvalidOperationException(errorMessage);
+                }
+
                 // Lấy thông tin StudentId và TutorId từ Match
-                conversationDto.StudentId = conversation.Match.StudentId;
-                conversationDto.TutorId = conversation.Match.TutorId;
+                conversationDto.StudentId = match.StudentId;
+                conversationDto.TutorId = match.TutorId;
 
                 // Lấy tên học sinh và gia sư từ bảng User
-                var student = await _studentRepository.GetStudentWithUserInfoAsync(conversation.Match.StudentId);  // Lấy thông tin học sinh
-                var tutor = await _tutorRepository.GetTutorWithDetailsAsync(conversation.Match.TutorId);            // Lấy thông tin gia sư
+                var student = await _studentRepository.GetStudentWithUserInfoAsync(match.StudentId);  // Lấy thông tin học sinh
+                var tutor = await _tutorRepository.GetTutorWithDetailsAsync(match.TutorId);            // Lấy thông tin gia sư
 
                 // Kiểm tra null và lấy tên
                 conversationDto.StudentName = student?.User?.FullName ?? "Unknown";
                 conversationDto.TutorName = tutor?.User?.FullName ?? "Unknown";
+                // Lấy thông tin tin nhắn cuối cùng
+                var lastMessage = await _messageRepository.GetLastMessageByConversationIdAsync(conversation.Id);
+                if (lastMessage != null)
+                {
+                    conversationDto.LastMessageId = lastMessage.Id;
+                    conversationDto.LastMessage = lastMessage.Content;
+                    conversationDto.LastMessageAt = lastMessage.CreatedAt;
+                }
             }
             else
             {
-                // Thêm thông báo chi tiết khi không có Match
-                var errorMessage = $"Không tìm thấy Match cho cuộc trò chuyện này. " +
+                // Thêm thông báo chi tiết khi không có MatchId
+                var errorMessage = $"Không tìm thấy MatchId cho cuộc trò chuyện này. " +
                                    $"Conversation ID: {conversation.Id}, " +
-                                   $"Match ID: {conversation.MatchId}, " +
-                                   $"Student ID: {conversation.Match?.StudentId ?? 0}, " +
-                                   $"Tutor ID: {conversation.Match?.TutorId ?? 0}, " +
-                                   $"LastMessageAt: {conversation.LastMessageAt}";
+                                   $"MatchId: {conversation.MatchId}";
 
                 throw new InvalidOperationException(errorMessage);
             }
 
             return conversationDto;
         }
+
+
 
 
     }

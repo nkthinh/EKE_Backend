@@ -11,7 +11,8 @@ namespace Repository.Entities
         public long MatchId { get; set; }
         public long? LastMessageId { get; set; }
         public DateTime? LastMessageAt { get; set; }
-
+        // Thêm LastMessage để lưu nội dung tin nhắn cuối cùng
+        public string? LastMessage { get; set; }
         // Navigation Properties
         public Match Match { get; set; } = null!;
         public ICollection<Message> Messages { get; set; } = new List<Message>();

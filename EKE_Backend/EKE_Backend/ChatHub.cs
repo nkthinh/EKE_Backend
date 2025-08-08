@@ -15,6 +15,12 @@ namespace EKE_Backend
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"Conversation_{conversationId}");
         }
+        // Phương thức để nhận tin nhắn
+        public async Task SendMessageToGroup(long conversationId, string message)
+        {
+            await Clients.Group($"Conversation_{conversationId}")
+                .SendAsync("ReceiveMessage", message);
+        }
     }
 
 }

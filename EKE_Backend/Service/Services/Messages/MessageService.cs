@@ -72,6 +72,12 @@ namespace Service.Services.Messages
             // Tiến hành tạo tin nhắn
             var message = _mapper.Map<Message>(messageDto);
             await _messageRepository.CreateAsync(message);
+            // Cập nhật thông tin tin nhắn mới nhất trong cuộc trò chuyện
+            conversation.LastMessageId = message.Id;
+            conversation.LastMessageAt = DateTime.UtcNow;
+            conversation.LastMessage = message.Content;  // Cập nhật tin nhắn cuối cùng
+
+            await _conversationRepository.UpdateAsync(conversation);
 
             // Trả về tin nhắn
             return _mapper.Map<MessageResponseDto>(message);

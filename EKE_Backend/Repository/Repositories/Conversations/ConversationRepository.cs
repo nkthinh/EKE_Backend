@@ -57,6 +57,10 @@ namespace Repository.Repositories.Conversations
             await _context.SaveChangesAsync();  // Lưu thay đổi vào cơ sở dữ liệu
             return conversation;
         }
-
+        public async Task UpdateAsync(Conversation conversation)
+        {
+            _context.Conversations.Update(conversation);  // Cập nhật đối tượng Conversation trong DbContext
+            await _context.SaveChangesAsync();            // Lưu thay đổi vào cơ sở dữ liệu
+        }
     }
 }

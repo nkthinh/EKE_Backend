@@ -18,5 +18,6 @@ namespace Repository.Repositories.Messages
         Task<bool> DeleteAsync(long messageId);
         Task<(IEnumerable<Message> Messages, int TotalCount)> SearchMessagesAsync(long conversationId, string query, int page, int pageSize);
         Task<bool> IsUserInConversationAsync(long conversationId, long userId);
+        Task<Message?> GetLastMessageByConversationIdAsync(long conversationId);
     }
 }

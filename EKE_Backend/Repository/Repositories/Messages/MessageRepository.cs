@@ -138,5 +138,13 @@ namespace Repository.Repositories.Messages
                             (m.SenderId == userId || m.Conversation.Match.Student.UserId == userId || m.Conversation.Match.Tutor.UserId == userId))
                 .AnyAsync();
         }
+        public async Task<Message?> GetLastMessageByConversationIdAsync(long conversationId)
+        {
+            return await _dbSet
+                .Where(m => m.ConversationId == conversationId)  // Lọc tin nhắn theo ConversationId
+                .OrderByDescending(m => m.CreatedAt)  // Sắp xếp theo thời gian gửi tin nhắn (từ mới nhất)
+                .FirstOrDefaultAsync();  // Lấy tin nhắn đầu tiên trong danh sách (là tin nhắn mới nhất)
+        }
+
     }
 }

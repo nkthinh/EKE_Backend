@@ -103,6 +103,8 @@ namespace EKE_Backend
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            // Cấu hình middleware cho SignalR
+            app.MapHub<ChatHub>("/chathub");  // Định nghĩa endpoint SignalR Hub
 
             app.UseCors("AllowAll");
             app.UseHttpsRedirection();

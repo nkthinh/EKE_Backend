@@ -14,5 +14,6 @@ namespace Repository.Repositories.Conversations
         Task<IEnumerable<Conversation>> GetUserConversationsAsync(long userId);
         Task<Conversation?> GetConversationWithDetailsAsync(long conversationId);
         Task<Conversation> CreateAsync(Conversation conversation);
+        Task UpdateAsync(Conversation conversation);
     }
 }
