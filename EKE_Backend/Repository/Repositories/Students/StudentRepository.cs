@@ -46,6 +46,16 @@ namespace Repository.Repositories.Students
             _dbSet.Update(student); // Cập nhật entity Student
             await _context.SaveChangesAsync(); // Lưu thay đổi vào cơ sở dữ liệu
         }
+        // Implement the method to get StudentId from UserId
+        public async Task<long?> GetStudentIdByUserIdAsync(long userId)
+        {
+            var student = await _dbSet
+                .Where(s => s.UserId == userId)
+                .Select(s => s.Id)  // Chỉ lấy Id của Student
+                .FirstOrDefaultAsync();
+
+            return student; // Trả về StudentId nếu tìm thấy, nếu không trả về null
+        }
 
     }
 }

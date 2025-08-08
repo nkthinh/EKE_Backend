@@ -12,6 +12,7 @@ namespace Repository.Entities
     {
         public long ConversationId { get; set; }
         public long SenderId { get; set; }
+
         public MessageType MessageType { get; set; } = MessageType.Text;
         public string? Content { get; set; }
         public string? FileUrl { get; set; }
@@ -21,5 +22,6 @@ namespace Repository.Entities
         // Navigation Properties
         public Conversation Conversation { get; set; } = null!;
         public User Sender { get; set; } = null!;
+
     }
 }

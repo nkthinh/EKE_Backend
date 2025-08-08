@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Repository.Entities;
 using Repository.Repositories;
 using Repository.Repositories.Conversations;
@@ -12,6 +13,7 @@ using Service.DTO.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Service.Services.Messages
@@ -38,36 +40,44 @@ namespace Service.Services.Messages
             _userRepository = userRepository;
         }
 
-        // Gửi tin nhắn
         public async Task<MessageResponseDto> SendMessageAsync(MessageCreateDto messageDto)
         {
-            // Kiểm tra SenderId có hợp lệ không
-            if (!await IsValidSenderId(messageDto.SenderId))
-            {
-                throw new ArgumentException("SenderId không hợp lệ.");
-            }
+            // Kiểm tra nếu SenderId có hợp lệ không (bằng currentUserId đã truyền vào)
+            var currentUserId = messageDto.SenderId; // Đã có SenderId từ API controller, không cần lấy lại
 
+            // Kiểm tra nếu conversationId hợp lệ
             var conversation = await _conversationRepository.GetByIdAsync(messageDto.ConversationId);
             if (conversation == null)
             {
                 throw new ArgumentException("Conversation không hợp lệ");
             }
 
+            // Lấy match từ cuộc trò chuyện, xác định StudentId và TutorId
             var match = await _matchRepository.GetByIdAsync(conversation.MatchId);
             if (match == null)
             {
                 throw new ArgumentException("Không tìm thấy Match cho cuộc trò chuyện này");
             }
 
-            if (match.StudentId != messageDto.SenderId && match.TutorId != messageDto.SenderId)
+            // Kiểm tra xem người dùng có phải là học sinh hoặc gia sư trong cuộc trò chuyện không
+            var isStudent = await _studentRepository.GetStudentIdByUserIdAsync(currentUserId) != null;
+            var isTutor = await _tutorRepository.GetTutorIdByUserIdAsync(currentUserId) != null;
+
+            if (!isStudent && !isTutor)
             {
-                throw new UnauthorizedAccessException("Bạn không có quyền gửi tin nhắn trong cuộc trò chuyện này");
+                throw new UnauthorizedAccessException("Người dùng không phải học sinh hoặc gia sư hợp lệ");
             }
 
+           
+            // Tiến hành tạo tin nhắn
             var message = _mapper.Map<Message>(messageDto);
             await _messageRepository.CreateAsync(message);
+
+            // Trả về tin nhắn
             return _mapper.Map<MessageResponseDto>(message);
         }
+
+
 
 
         // Gửi tin nhắn có đính kèm tệp
@@ -78,13 +88,22 @@ namespace Service.Services.Messages
             return _mapper.Map<MessageResponseDto>(message);
         }
 
-        // Lấy tất cả tin nhắn trong một cuộc trò chuyện
+
+
         public async Task<(IEnumerable<MessageResponseDto> Messages, int TotalCount)> GetConversationMessagesAsync(long conversationId, int page, int pageSize)
         {
+            // Lấy tất cả tin nhắn trong cuộc trò chuyện
             var (messages, totalCount) = await _messageRepository.GetPagedMessagesAsync(conversationId, page, pageSize);
+
+            // Chuyển đổi sang DTO trước khi trả về
             var messageDtos = _mapper.Map<IEnumerable<MessageResponseDto>>(messages);
             return (messageDtos, totalCount);
         }
+
+
+
+
+
 
         // Đánh dấu tin nhắn là đã đọc
         public async Task MarkMessagesAsReadAsync(long conversationId, long userId)
@@ -100,24 +119,48 @@ namespace Service.Services.Messages
             return (messageDtos, totalCount);
         }
 
-        // Kiểm tra xem người dùng có phải là thành viên trong cuộc trò chuyện không
         public async Task<bool> IsUserInConversationAsync(long conversationId, long userId)
         {
+            // Lấy user từ bảng Student hoặc Tutor
+            var student = await _studentRepository.GetStudentByUserIdAsync(userId);  // Kiểm tra nếu userId là học sinh
+            var tutor = await _tutorRepository.GetTutorByUserIdAsync(userId);        // Kiểm tra nếu userId là gia sư
+
+            // Nếu không phải học sinh và cũng không phải gia sư, ném lỗi
+            if (student == null && tutor == null)
+            {
+                throw new UnauthorizedAccessException("User không phải học sinh hoặc gia sư hợp lệ");
+            }
+
+            // Lấy cuộc trò chuyện bằng conversationId
             var conversation = await _conversationRepository.GetByIdAsync(conversationId);
             if (conversation == null)
             {
-                throw new ArgumentException($"Conversation with ID {conversationId} not found");
+                throw new ArgumentException($"Không tìm thấy cuộc trò chuyện với ID {conversationId}");
             }
 
+            // Lấy match từ cuộc trò chuyện, xác định StudentId và TutorId
             var match = await _matchRepository.GetByIdAsync(conversation.MatchId);
             if (match == null)
             {
-                throw new ArgumentException($"Match with ID {conversation.MatchId} not found");
+                throw new ArgumentException($"Không tìm thấy match với ID {conversation.MatchId}");
             }
 
-            // Kiểm tra quyền truy cập của học sinh hoặc gia sư
-            return match.StudentId == userId || match.TutorId == userId;
+            // Kiểm tra nếu người dùng là học sinh (so sánh với StudentId) hoặc gia sư (so sánh với TutorId)
+            if (student != null && match.StudentId == student.Id)
+            {
+                return true;  // Người dùng là học sinh và là phần của match
+            }
+
+            if (tutor != null && match.TutorId == tutor.Id)
+            {
+                return true;  // Người dùng là gia sư và là phần của match
+            }
+
+            return false;  // Người dùng không phải học sinh hoặc gia sư trong cuộc trò chuyện
         }
+
+
+
 
         // Đếm số lượng tin nhắn chưa đọc cho người dùng
         public async Task<int> GetUnreadMessageCountAsync(long userId)
@@ -149,6 +192,9 @@ namespace Service.Services.Messages
             return _mapper.Map<ConversationResponseDto>(conversation);
         }
 
+
+
+
         // Lấy tất cả các cuộc trò chuyện của người dùng
         public async Task<IEnumerable<ConversationResponseDto>> GetUserConversationsAsync(long userId)
         {
@@ -173,6 +219,7 @@ namespace Service.Services.Messages
             var user = await _userRepository.GetByIdAsync(senderId);
             return user != null;
         }
+  
 
     }
 }

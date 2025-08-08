@@ -71,5 +71,7 @@ namespace Repository.Repositories.Tutors
 
         // Tải và lưu ảnh đại diện cho tutor
         Task<string> UploadProfileImageAsync(long tutorId, string imageUrl);
+        // Thêm phương thức lấy TutorId từ UserId
+        Task<long?> GetTutorIdByUserIdAsync(long userId);
     }
 }

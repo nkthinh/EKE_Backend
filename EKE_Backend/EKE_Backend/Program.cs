@@ -38,8 +38,11 @@ namespace EKE_Backend
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
-                        )
+                        ),
+                        // Thêm phần xác thực Claims nếu cần
+                        RoleClaimType = "Role" // Xác định rằng "Role" là claim chứa thông tin Role
                     };
+
                 });
 
             builder.Services.AddAuthorization();

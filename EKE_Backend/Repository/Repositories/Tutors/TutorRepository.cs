@@ -13,6 +13,17 @@ namespace Repository.Repositories.Tutors
     {
         public TutorRepository(ApplicationDbContext context) : base(context) { }
 
+        // Implement the method to get TutorId from UserId
+        public async Task<long?> GetTutorIdByUserIdAsync(long userId)
+        {
+            var tutor = await _dbSet
+                .Where(s => s.UserId == userId)
+                .Select(s => s.Id)  // Chỉ lấy Id của Student
+                .FirstOrDefaultAsync();
+
+            return tutor; // Trả về StudentId nếu tìm thấy, nếu không trả về null
+        }
+
         public async Task<Tutor?> GetTutorWithDetailsAsync(long tutorId)
         {
             return await _dbSet

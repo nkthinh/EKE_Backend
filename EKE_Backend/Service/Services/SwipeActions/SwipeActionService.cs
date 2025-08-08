@@ -109,6 +109,15 @@ namespace Service.Services.SwipeActions
             // Lấy danh sách các studentId đã like tutor
             var likedStudentsIds = await _swipeActionRepository.GetSwipedStudentIdsByTutorAsync(tutorId);
 
+            // Kiểm tra nếu không có studentId nào đã "like" tutor
+            if (likedStudentsIds == null || !likedStudentsIds.Any())
+            {
+                _logger.LogInformation("No students have liked tutor with ID {TutorId}", tutorId);
+                return new List<StudentResponseDto>();  // Trả về danh sách trống nếu không có học sinh nào
+            }
+
+            _logger.LogInformation("Liked student IDs: {LikedStudentsIds}", string.Join(", ", likedStudentsIds));
+
             // Lấy thông tin chi tiết về các student đó
             var students = new List<StudentResponseDto>();
             foreach (var studentId in likedStudentsIds)
@@ -124,11 +133,14 @@ namespace Service.Services.SwipeActions
                         IsOnline = true // Bạn có thể kiểm tra trạng thái online ở đây nếu sử dụng SignalR hoặc một hệ thống khác
                     });
                 }
+                else
+                {
+                    _logger.LogWarning("No student found with ID {StudentId}", studentId);
+                }
             }
 
             return students;
         }
-
 
     }
 }

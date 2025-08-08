@@ -14,18 +14,19 @@ namespace Repository.Repositories.Messages
         public async Task<(IEnumerable<Message> Messages, int TotalCount)> GetPagedMessagesAsync(long conversationId, int page, int pageSize)
         {
             var query = _dbSet
-                .Include(m => m.Sender)
-                .Where(m => m.ConversationId == conversationId);
+                .Where(m => m.ConversationId == conversationId)
+                .OrderByDescending(m => m.CreatedAt); // Sắp xếp tin nhắn theo thời gian gửi
 
             var totalCount = await query.CountAsync();
             var messages = await query
-                .OrderByDescending(m => m.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .ToListAsync();
+                .ToListAsync(); // Lấy các tin nhắn theo trang
 
-            return (messages.OrderBy(m => m.CreatedAt), totalCount);
+            return (messages, totalCount);
         }
+
+
 
         public async Task<Message?> GetMessageWithSenderAsync(long messageId)
         {
