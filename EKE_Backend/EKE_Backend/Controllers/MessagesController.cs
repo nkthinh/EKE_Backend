@@ -171,7 +171,7 @@ namespace EKE_Backend.Controllers
 
         private async Task<long> GetStudentIdByUserId(long userId)
         {
-            var student = await _studentRepository.GetStudentByUserIdAsync(userId); // Truy vấn để lấy StudentId từ bảng Student
+            var student = await _studentRepository.GetStudentsWithUserInfoAsync(userId); // Truy vấn để lấy StudentId từ bảng Student
             if (student == null)
             {
                 throw new UnauthorizedAccessException("Không tìm thấy học sinh");

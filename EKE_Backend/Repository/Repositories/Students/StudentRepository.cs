@@ -16,9 +16,10 @@ namespace Repository.Repositories.Students
         public async Task<Student?> GetStudentWithUserInfoAsync(long studentId)
         {
             return await _dbSet
-                .Include(s => s.User)
-                .FirstOrDefaultAsync(s => s.Id == studentId);
+                .Include(s => s.User)  // Bao gồm thông tin người dùng (User)
+                .FirstOrDefaultAsync(s => s.Id == studentId);  // Tìm học sinh theo studentId
         }
+
 
         public async Task<IEnumerable<Student>> GetStudentsWithUserInfoAsync()
         {
@@ -29,12 +30,18 @@ namespace Repository.Repositories.Students
                 .ToListAsync();
         }
 
-        public async Task<Student?> GetStudentByUserIdAsync(long userId)
+        public async Task<Student?> GetStudentsWithUserInfoAsync(long userId)
         {
-            return await _dbSet
-                .Include(s => s.User)
-                .FirstOrDefaultAsync(s => s.UserId == userId);
+            // Lấy học sinh và thông tin User nếu User đang hoạt động
+            var student = await _dbSet
+                .Include(s => s.User)  // Bao gồm thông tin người dùng
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.User.IsActive);  // Kiểm tra trạng thái của User
+
+          
+
+            return student;
         }
+
         public async Task<Student?> GetByUserIdAsync(long userId)
         {
             return await _dbSet

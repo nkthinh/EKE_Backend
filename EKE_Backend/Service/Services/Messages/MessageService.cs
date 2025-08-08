@@ -122,7 +122,7 @@ namespace Service.Services.Messages
         public async Task<bool> IsUserInConversationAsync(long conversationId, long userId)
         {
             // Lấy user từ bảng Student hoặc Tutor
-            var student = await _studentRepository.GetStudentByUserIdAsync(userId);  // Kiểm tra nếu userId là học sinh
+            var student = await _studentRepository.GetStudentsWithUserInfoAsync(userId);  // Kiểm tra nếu userId là học sinh
             var tutor = await _tutorRepository.GetTutorByUserIdAsync(userId);        // Kiểm tra nếu userId là gia sư
 
             // Nếu không phải học sinh và cũng không phải gia sư, ném lỗi

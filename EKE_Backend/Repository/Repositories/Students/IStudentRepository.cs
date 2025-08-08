@@ -12,7 +12,7 @@ namespace Repository.Repositories.Students
     {
         Task<Student?> GetStudentWithUserInfoAsync(long studentId);
         Task<IEnumerable<Student>> GetStudentsWithUserInfoAsync();
-        Task<Student?> GetStudentByUserIdAsync(long userId);
+        Task<Student?> GetStudentsWithUserInfoAsync(long userId);
         Task<Student?> GetByUserIdAsync(long userId);
         Task UpdateAsync(Student student);
         Task<long?> GetStudentIdByUserIdAsync(long userId);

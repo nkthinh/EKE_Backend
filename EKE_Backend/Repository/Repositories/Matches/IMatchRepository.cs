@@ -24,5 +24,6 @@ namespace Repository.Repositories.Matches
         Task<Match> CreateAsync(Match match);
         Task<Match> UpdateAsync(Match match);
         Task<bool> DeleteAsync(long id);
+        Task<Match?> GetMatchByStudentAndTutorAsync(long studentId, long tutorId);
     }
 }

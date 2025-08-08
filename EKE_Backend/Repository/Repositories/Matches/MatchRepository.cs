@@ -18,7 +18,12 @@ namespace Repository.Repositories.Matches
             return await _dbSet
                 .FirstOrDefaultAsync(m => m.StudentId == studentId && m.TutorId == tutorId);
         }
-
+        public async Task<Match?> GetMatchByStudentAndTutorAsync(long studentId, long tutorId)
+        {
+            return await _context.Matches
+                .Where(m => m.StudentId == studentId && m.TutorId == tutorId && m.Status == MatchStatus.Active)
+                .FirstOrDefaultAsync();
+        }
         public async Task<Match?> GetMatchWithDetailsAsync(long matchId)
         {
             return await _dbSet

@@ -106,14 +106,14 @@ namespace Service.Services.SwipeActions
 
         public async Task<IEnumerable<StudentResponseDto>> GetLikedStudentsByTutorAsync(long tutorId)
         {
-            // Lấy danh sách các studentId đã like tutor
+            // Lấy danh sách các studentId đã "like" tutor
             var likedStudentsIds = await _swipeActionRepository.GetSwipedStudentIdsByTutorAsync(tutorId);
 
             // Kiểm tra nếu không có studentId nào đã "like" tutor
             if (likedStudentsIds == null || !likedStudentsIds.Any())
             {
-                _logger.LogInformation("No students have liked tutor with ID {TutorId}", tutorId);
-                return new List<StudentResponseDto>();  // Trả về danh sách trống nếu không có học sinh nào
+                // Nếu không có học sinh nào "like" tutor, trả về danh sách trống
+                return new List<StudentResponseDto>();
             }
 
             _logger.LogInformation("Liked student IDs: {LikedStudentsIds}", string.Join(", ", likedStudentsIds));
@@ -122,25 +122,48 @@ namespace Service.Services.SwipeActions
             var students = new List<StudentResponseDto>();
             foreach (var studentId in likedStudentsIds)
             {
-                var student = await _studentRepository.GetStudentByUserIdAsync(studentId);
+                // Kiểm tra xem học sinh đã có match với tutor chưa
+                var existingMatch = await _matchRepository.GetMatchByStudentAndTutorAsync(studentId, tutorId);
+
+                // Nếu học sinh đã có match với tutor, không cần thêm vào danh sách
+                if (existingMatch != null && existingMatch.Status == MatchStatus.Active)
+                {
+                    continue; // Bỏ qua học sinh này nếu đã có match active
+                }
+
+                var student = await _studentRepository.GetStudentWithUserInfoAsync(studentId);
+
+                // Kiểm tra xem student có null không
                 if (student != null)
                 {
-                    students.Add(new StudentResponseDto
+                    // Kiểm tra xem User có null không
+                    if (student.User != null)
                     {
-                        Id = student.Id,
-                        FullName = student.User?.FullName, // Lấy tên đầy đủ từ bảng User
-                        ProfileImage = student.User?.ProfileImage, // Lấy ảnh đại diện từ bảng User
-                        IsOnline = true // Bạn có thể kiểm tra trạng thái online ở đây nếu sử dụng SignalR hoặc một hệ thống khác
-                    });
+                        students.Add(new StudentResponseDto
+                        {
+                            Id = student.Id,
+                            FullName = student.User.FullName, // Lấy tên đầy đủ từ bảng User
+                            ProfileImage = student.User.ProfileImage, // Lấy ảnh đại diện từ bảng User
+                            IsOnline = true // Bạn có thể kiểm tra trạng thái online ở đây nếu sử dụng SignalR hoặc một hệ thống khác
+                        });
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"User information is missing for student with ID {studentId}");
+                    }
                 }
                 else
                 {
-                    _logger.LogWarning("No student found with ID {StudentId}", studentId);
+                    _logger.LogWarning($"No student found with ID {studentId}");
                 }
             }
 
+            // Trả về danh sách học sinh tìm được, nếu không có học sinh hợp lệ sẽ trả về danh sách trống
             return students;
         }
+
+
+
 
     }
 }

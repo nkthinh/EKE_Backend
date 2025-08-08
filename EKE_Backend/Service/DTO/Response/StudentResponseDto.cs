@@ -13,7 +13,6 @@ namespace Service.DTO.Response
         public string FullName { get; set; }  // Tên đầy đủ học sinh từ bảng User
         public string? ProfileImage { get; set; }  // Ảnh đại diện học sinh từ bảng User
         public string? SchoolName { get; set; }  // Tên trường học của học sinh
-     
         public string? GradeLevel { get; set; }  // Mức độ lớp của học sinh
         public string? LearningGoals { get; set; }  // Mục tiêu học tập của học sinh
         public string? PreferredSchedule { get; set; }  // Lịch học của học sinh
