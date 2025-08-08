@@ -1,7 +1,7 @@
 ﻿using Repository.Enums;
 using System;
 
-namespace Application.DTOs
+namespace Service.DTO.Response
 {
     public class MatchResponseDto
     {
@@ -14,5 +14,11 @@ namespace Application.DTOs
         public string? StudentName { get; set; }
         public string? TutorName { get; set; }
         public int ConversationCount { get; set; }
+
+        // Thêm các trường liên quan đến Student, Tutor và Conversation
+        public UserBasicInfoDto Student { get; set; } // DTO cho học sinh
+        public UserBasicInfoDto Tutor { get; set; } // DTO cho gia sư
+        public ConversationResponseDto Conversation { get; set; } // DTO cho cuộc trò chuyện
     }
+
 }

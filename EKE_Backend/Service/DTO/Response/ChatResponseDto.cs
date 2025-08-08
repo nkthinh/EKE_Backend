@@ -29,7 +29,16 @@ namespace Service.DTO.Response
         public string? LastMessage { get; set; }
         public int UnreadCount { get; set; }
         public bool IsOnline { get; set; }
+
+        // Thêm StudentId và TutorId
+        public long StudentId { get; set; }  // ID học sinh
+        public long TutorId { get; set; }    // ID gia sư
+
+        // Thêm tên học sinh và gia sư
+        public string? StudentName { get; set; }  // Tên của học sinh
+        public string? TutorName { get; set; }    // Tên của gia sư
     }
+
 
     public class MessageResponseDto
     {

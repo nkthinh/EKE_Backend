@@ -1,8 +1,12 @@
 ﻿using Application.DTOs;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Service.DTO.Response;
+using Service.Services.Conversations;
+using Service.Services.Matches;
 using System;
 using System.Collections.Generic;
+using System.Security.AccessControl;
 using System.Threading.Tasks;
 
 namespace WebAPI.Controllers
@@ -12,10 +16,12 @@ namespace WebAPI.Controllers
     public class MatchController : ControllerBase
     {
         private readonly IMatchService _matchService;
+        private readonly IConversationService _conversationService;
 
-        public MatchController(IMatchService matchService)
+        public MatchController(IMatchService matchService, IConversationService conversationService)
         {
             _matchService = matchService;
+            _conversationService = conversationService;
         }
 
         /// <summary>
@@ -35,6 +41,7 @@ namespace WebAPI.Controllers
                 return BadRequest($"Error retrieving matches: {ex.Message}");
             }
         }
+    
 
         /// <summary>
         /// Get match by ID

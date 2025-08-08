@@ -11,5 +11,6 @@ namespace Service.Services.Conversations
     {
         Task<ConversationResponseDto> GetOrCreateConversationAsync(long matchId);
         Task<IEnumerable<ConversationResponseDto>> GetUserConversationsAsync(long userId);
+        Task<ConversationResponseDto> GetConversationByIdAsync(long conversationId);
     }
 }

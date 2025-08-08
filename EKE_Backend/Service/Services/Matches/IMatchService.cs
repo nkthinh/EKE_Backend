@@ -1,10 +1,11 @@
 ﻿using Application.DTOs;
 using Repository.Entities;
+using Service.DTO.Response;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Application.Services.Interfaces
+namespace Service.Services.Matches
 {
     public interface IMatchService
     {
@@ -16,5 +17,7 @@ namespace Application.Services.Interfaces
         Task<IEnumerable<MatchResponseDto>> GetMatchesByStudentAsync(long studentId);
         Task<IEnumerable<MatchResponseDto>> GetMatchesByTutorAsync(long tutorId);
         Task<bool> UpdateLastActivityAsync(long id);
+        // Thêm phương thức kiểm tra match active giữa học sinh và gia sư
+        Task<bool> CheckActiveMatch(long studentId, long tutorId);
     }
 }

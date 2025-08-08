@@ -20,6 +20,7 @@ using Service.Services.Chat;
 using Service.Services.Conversations;
 using Service.Services.Jwt;
 using Service.Services.Locations;
+using Service.Services.Matches;
 using Service.Services.Matching;
 using Service.Services.Messages;
 using Service.Services.Notifications;

@@ -7,12 +7,13 @@ using Repository.Repositories;
 using Repository.Repositories.Matches;
 using Repository.Repositories.Students;
 using Repository.Repositories.Tutors;
+using Service.DTO.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Application.Services
+namespace Service.Services.Matches
 {
     public class MatchService : IMatchService
     {
@@ -160,5 +161,19 @@ namespace Application.Services
                 ConversationCount = match.Conversations?.Count ?? 0
             };
         }
+        public async Task<bool> CheckActiveMatch(long studentId, long tutorId)
+        {
+            try
+            {
+                var studentMatches = await _matchRepository.GetMatchesByStudentIdAsync(studentId);
+                return studentMatches.Any(m => m.TutorId == tutorId && m.Status == MatchStatus.Active);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking active match between student {StudentId} and tutor {TutorId}", studentId, tutorId);
+                throw;  // Rethrow the exception
+            }
+        }
+
     }
 }

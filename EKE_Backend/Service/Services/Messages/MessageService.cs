@@ -1,15 +1,18 @@
 ﻿using AutoMapper;
-using Repository.Repositories.Messages;
-using Repository.Repositories.Conversations;
 using Repository.Entities;
+using Repository.Repositories;
+using Repository.Repositories.Conversations;
+using Repository.Repositories.Matches;
+using Repository.Repositories.Messages;
+using Repository.Repositories.Students;
+using Repository.Repositories.Tutors;
+using Repository.Repositories.Users;
 using Service.DTO.Request;
 using Service.DTO.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Repository.Repositories;
-using Repository.Repositories.Matches;
 
 namespace Service.Services.Messages
 {
@@ -19,22 +22,53 @@ namespace Service.Services.Messages
         private readonly IConversationRepository _conversationRepository;
         private readonly IMapper _mapper;
         private readonly IMatchRepository _matchRepository;
+        private readonly IStudentRepository _studentRepository;
+        private readonly ITutorRepository _tutorRepository;
+        private readonly IUserRepository _userRepository;
 
-        public MessageService(IMessageRepository messageRepository, IConversationRepository conversationRepository, IMapper mapper, IMatchRepository matchRepository)
+        public MessageService(IMessageRepository messageRepository, IConversationRepository conversationRepository, IMapper mapper,
+            IMatchRepository matchRepository, IStudentRepository studentRepository, ITutorRepository tutorRepository, IUserRepository userRepository)
         {
             _messageRepository = messageRepository;
             _conversationRepository = conversationRepository;
             _mapper = mapper;
             _matchRepository = matchRepository;
+            _studentRepository = studentRepository;
+            _tutorRepository = tutorRepository;
+            _userRepository = userRepository;
         }
 
         // Gửi tin nhắn
         public async Task<MessageResponseDto> SendMessageAsync(MessageCreateDto messageDto)
         {
+            // Kiểm tra SenderId có hợp lệ không
+            if (!await IsValidSenderId(messageDto.SenderId))
+            {
+                throw new ArgumentException("SenderId không hợp lệ.");
+            }
+
+            var conversation = await _conversationRepository.GetByIdAsync(messageDto.ConversationId);
+            if (conversation == null)
+            {
+                throw new ArgumentException("Conversation không hợp lệ");
+            }
+
+            var match = await _matchRepository.GetByIdAsync(conversation.MatchId);
+            if (match == null)
+            {
+                throw new ArgumentException("Không tìm thấy Match cho cuộc trò chuyện này");
+            }
+
+            if (match.StudentId != messageDto.SenderId && match.TutorId != messageDto.SenderId)
+            {
+                throw new UnauthorizedAccessException("Bạn không có quyền gửi tin nhắn trong cuộc trò chuyện này");
+            }
+
             var message = _mapper.Map<Message>(messageDto);
             await _messageRepository.CreateAsync(message);
             return _mapper.Map<MessageResponseDto>(message);
         }
+
 
         // Gửi tin nhắn có đính kèm tệp
         public async Task<MessageResponseDto> SendMessageWithFileAsync(MessageWithFileDto messageDto)
@@ -69,7 +103,20 @@ namespace Service.Services.Messages
         // Kiểm tra xem người dùng có phải là thành viên trong cuộc trò chuyện không
         public async Task<bool> IsUserInConversationAsync(long conversationId, long userId)
         {
-            return await _messageRepository.IsUserInConversationAsync(conversationId, userId);
+            var conversation = await _conversationRepository.GetByIdAsync(conversationId);
+            if (conversation == null)
+            {
+                throw new ArgumentException($"Conversation with ID {conversationId} not found");
+            }
+
+            var match = await _matchRepository.GetByIdAsync(conversation.MatchId);
+            if (match == null)
+            {
+                throw new ArgumentException($"Match with ID {conversation.MatchId} not found");
+            }
+
+            // Kiểm tra quyền truy cập của học sinh hoặc gia sư
+            return match.StudentId == userId || match.TutorId == userId;
         }
 
         // Đếm số lượng tin nhắn chưa đọc cho người dùng
@@ -121,5 +168,11 @@ namespace Service.Services.Messages
 
             return await _messageRepository.DeleteAsync(messageId);
         }
+        public async Task<bool> IsValidSenderId(long senderId)
+        {
+            var user = await _userRepository.GetByIdAsync(senderId);
+            return user != null;
+        }
+
     }
 }

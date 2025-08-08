@@ -27,20 +27,7 @@ namespace Service.DTO.Response
         public int Age { get; set; }
     }
 
-    public class MatchResponseDto
-    {
-        public long Id { get; set; }
-        public long StudentId { get; set; }
-        public long TutorId { get; set; }
-        public MatchStatus Status { get; set; }
-        public DateTime MatchedAt { get; set; }
-        public DateTime LastActivity { get; set; }
-
-        // Navigation data
-        public UserBasicInfoDto Student { get; set; } = null!;
-        public UserBasicInfoDto Tutor { get; set; } = null!;
-        public ConversationBasicDto? Conversation { get; set; }
-    }
+  
     public class UserBasicInfoDto
     {
         public long Id { get; set; }

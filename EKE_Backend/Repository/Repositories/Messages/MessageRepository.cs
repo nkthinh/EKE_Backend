@@ -36,9 +36,17 @@ namespace Repository.Repositories.Messages
 
         public async Task<Message> CreateAsync(Message message)
         {
-            await _dbSet.AddAsync(message);
-            await _context.SaveChangesAsync();
-            return message;
+             try
+    {
+        await _dbSet.AddAsync(message);
+        await _context.SaveChangesAsync();
+        return message;
+    }
+    catch (DbUpdateException ex)
+    {
+        // In ra thông báo lỗi chi tiết
+        throw new InvalidOperationException("Error while saving message. Inner exception: " + ex.InnerException?.Message, ex);
+    }
         }
 
         public async Task<bool> DeleteAsync(long messageId)

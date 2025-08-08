@@ -4,10 +4,18 @@ namespace EKE_Backend
 {
     public class ChatHub : Hub
     {
-        public async Task SendMessage(string user, string message)
+        // Tham gia vào nhóm (Group) theo ConversationId
+        public async Task JoinConversation(long conversationId)
         {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"Conversation_{conversationId}");
+        }
+
+        // Rời nhóm (Group) khi kết thúc cuộc trò chuyện
+        public async Task LeaveConversation(long conversationId)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"Conversation_{conversationId}");
         }
     }
+
 }
-    
+
