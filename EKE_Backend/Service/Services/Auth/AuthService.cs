@@ -58,6 +58,16 @@ namespace Service.Services.Auth
                 var accessToken = _jwtService.GenerateAccessToken(user);
                 var refreshToken = _jwtService.GenerateRefreshToken();
 
+                var wallet = new Wallet
+                {
+                    UserId = user.Id,
+                    Balance = 0, // Số dư ban đầu
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                await _unitOfWork.Wallets.AddAsync(wallet);
+                await _unitOfWork.CompleteAsync();
+
                 return new RegistrationStepResponseDto
                 {
                     AccessToken = accessToken,
@@ -93,7 +103,7 @@ namespace Service.Services.Auth
 
                 // Validate and set role
                 if (!Enum.TryParse<UserRole>(roleDto.Role, out var role) ||
-                    role == UserRole.Unspecified || role == UserRole.Admin)
+                    role == UserRole.Unspecified)
                 {
                     throw new InvalidOperationException("Vai trò không hợp lệ");
                 }

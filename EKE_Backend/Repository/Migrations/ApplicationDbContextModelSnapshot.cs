@@ -127,37 +127,37 @@ namespace Repository.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1425),
+                            CreatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3532),
                             Description = "Số lần swipe tối đa mỗi ngày",
                             KeyName = "max_swipes_per_day",
-                            UpdatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1426),
+                            UpdatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3532),
                             Value = "50"
                         },
                         new
                         {
                             Id = 2L,
-                            CreatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1428),
+                            CreatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3533),
                             Description = "Rating tối thiểu để hiển thị gia sư",
                             KeyName = "min_tutor_rating",
-                            UpdatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1428),
+                            UpdatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3534),
                             Value = "3.0"
                         },
                         new
                         {
                             Id = 3L,
-                            CreatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1430),
+                            CreatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3535),
                             Description = "Số lần super like mỗi ngày",
                             KeyName = "super_like_limit",
-                            UpdatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1430),
+                            UpdatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3535),
                             Value = "5"
                         },
                         new
                         {
                             Id = 4L,
-                            CreatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1432),
+                            CreatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3536),
                             Description = "Bật/tắt tính năng chat AI",
                             KeyName = "chat_ai_enabled",
-                            UpdatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1432),
+                            UpdatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3537),
                             Value = "true"
                         });
                 });
@@ -666,80 +666,80 @@ namespace Repository.Migrations
                             Id = 1L,
                             Category = "Khoa học tự nhiên",
                             Code = "MATH",
-                            CreatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1254),
+                            CreatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3424),
                             IsActive = true,
                             Name = "Toán học",
-                            UpdatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1255)
+                            UpdatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3425)
                         },
                         new
                         {
                             Id = 2L,
                             Category = "Khoa học tự nhiên",
                             Code = "PHYSICS",
-                            CreatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1257),
+                            CreatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3427),
                             IsActive = true,
                             Name = "Vật lý",
-                            UpdatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1258)
+                            UpdatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3427)
                         },
                         new
                         {
                             Id = 3L,
                             Category = "Khoa học tự nhiên",
                             Code = "CHEMISTRY",
-                            CreatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1260),
+                            CreatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3429),
                             IsActive = true,
                             Name = "Hóa học",
-                            UpdatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1260)
+                            UpdatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3429)
                         },
                         new
                         {
                             Id = 4L,
                             Category = "Khoa học tự nhiên",
                             Code = "BIOLOGY",
-                            CreatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1263),
+                            CreatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3430),
                             IsActive = true,
                             Name = "Sinh học",
-                            UpdatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1263)
+                            UpdatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3431)
                         },
                         new
                         {
                             Id = 5L,
                             Category = "Khoa học xã hội",
                             Code = "LITERATURE",
-                            CreatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1265),
+                            CreatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3432),
                             IsActive = true,
                             Name = "Văn học",
-                            UpdatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1265)
+                            UpdatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3432)
                         },
                         new
                         {
                             Id = 6L,
                             Category = "Ngoại ngữ",
                             Code = "ENGLISH",
-                            CreatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1267),
+                            CreatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3434),
                             IsActive = true,
                             Name = "Tiếng Anh",
-                            UpdatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1267)
+                            UpdatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3434)
                         },
                         new
                         {
                             Id = 7L,
                             Category = "Khoa học xã hội",
                             Code = "HISTORY",
-                            CreatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1269),
+                            CreatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3435),
                             IsActive = true,
                             Name = "Lịch sử",
-                            UpdatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1269)
+                            UpdatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3436)
                         },
                         new
                         {
                             Id = 8L,
                             Category = "Khoa học xã hội",
                             Code = "GEOGRAPHY",
-                            CreatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1271),
+                            CreatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3437),
                             IsActive = true,
                             Name = "Địa lý",
-                            UpdatedAt = new DateTime(2025, 8, 8, 16, 36, 1, 441, DateTimeKind.Utc).AddTicks(1271)
+                            UpdatedAt = new DateTime(2025, 8, 9, 5, 0, 19, 879, DateTimeKind.Utc).AddTicks(3437)
                         });
                 });
 

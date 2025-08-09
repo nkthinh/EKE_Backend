@@ -20,6 +20,17 @@ public class WalletService : IWalletService
         _logger = logger;
     }
 
+    public async Task<WalletResponseDto?> GetByUserIdAsync(long userId)
+    {
+        var wallet = await _unitOfWork.Wallets
+            .Query()
+            .Include(w => w.User) // Nếu muốn trả luôn thông tin user
+            .FirstOrDefaultAsync(w => w.UserId == userId);
+
+        return wallet == null ? null : _mapper.Map<WalletResponseDto>(wallet);
+    }
+    
+
     public async Task<IEnumerable<WalletResponseDto>> GetAllAsync()
     {
         var wallets = await _unitOfWork.Wallets.GetAllAsync();

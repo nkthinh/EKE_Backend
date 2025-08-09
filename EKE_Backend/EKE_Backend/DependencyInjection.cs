@@ -6,6 +6,7 @@ using Repository.Repositories.Conversations;
 using Repository.Repositories.Matches;
 using Repository.Repositories.Messages;
 using Repository.Repositories.Notifications;
+using Repository.Repositories.Repository.Repositories.SubscriptionPackages;
 using Repository.Repositories.Reviews;
 using Repository.Repositories.Students;
 using Repository.Repositories.SwipeActions;
@@ -14,6 +15,7 @@ using Repository.Repositories.Users;
 using Repository.UnitOfWork;
 using Service.Firebase;
 using Service.Mapping;
+using Service.Services;
 using Service.Services.Auth;
 using Service.Services.Certifications;
 using Service.Services.Chat;
@@ -27,6 +29,7 @@ using Service.Services.Notifications;
 using Service.Services.Reviews;
 using Service.Services.Students;
 using Service.Services.Subjects;
+using Service.Services.SubscriptionPackages;
 using Service.Services.SwipeActions;
 using Service.Services.Tutors;
 using Service.Services.TutorSubjects;
@@ -84,6 +87,12 @@ namespace EKE_Backend
             services.AddScoped<IConversationService, ConversationService>();
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<ISwipeActionService, SwipeActionService>();
+
+
+            services.AddScoped<IWalletService, WalletService>();
+            services.AddScoped<IWalletRepository, WalletRepository>();
+            services.AddScoped<ISubscriptionPackageService, SubscriptionPackageService>();
+            services.AddScoped<ISubscriptionPackageRepository, SubscriptionPackageRepository>();
             return services;
         }
     }
