@@ -92,11 +92,11 @@ namespace Service.Services.Auth
                 }
 
                 // Validate and set role
-                if (!Enum.TryParse<UserRole>(roleDto.Role, out var role) ||
-                    role == UserRole.Unspecified || role == UserRole.Admin)
+                if (!Enum.TryParse<UserRole>(roleDto.Role, out var role) || role == UserRole.Unspecified)
                 {
                     throw new InvalidOperationException("Vai trò không hợp lệ");
                 }
+
 
                 user.Role = role;
                 user.UpdatedAt = DateTime.UtcNow;
