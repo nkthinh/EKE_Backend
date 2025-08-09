@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Service.DTO.Request
+﻿namespace Service.DTO.Request
 {
+    // Dùng cho Admin
     public class WalletRequestDto
     {
         public long UserId { get; set; }
+        public decimal Balance { get; set; }
+    }
+
+    // Dùng cho user hiện tại (UserId sẽ lấy từ token)
+    public class WalletSelfUpdateRequestDto
+    {
         public decimal Balance { get; set; }
     }
 }

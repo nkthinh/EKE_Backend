@@ -45,8 +45,9 @@ namespace Service.Services.Auth
                     Email = accountDto.Email,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(accountDto.Password),
                     FullName = accountDto.FullName,
-                    Role = UserRole.Unspecified, // Chưa chọn role
+                    Role = UserRole.Unspecified,
                     IsActive = true,
+                    SubscriptionPackageId = 1, // ✅ Gán gói mặc định ID=1
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
@@ -54,19 +55,20 @@ namespace Service.Services.Auth
                 await _unitOfWork.Users.AddAsync(user);
                 await _unitOfWork.CompleteAsync();
 
-                // Generate tokens
-                var accessToken = _jwtService.GenerateAccessToken(user);
-                var refreshToken = _jwtService.GenerateRefreshToken();
-
+                // Tạo ví mặc định
                 var wallet = new Wallet
                 {
                     UserId = user.Id,
-                    Balance = 0, // Số dư ban đầu
+                    Balance = 0,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
                 await _unitOfWork.Wallets.AddAsync(wallet);
                 await _unitOfWork.CompleteAsync();
+
+                // Generate tokens
+                var accessToken = _jwtService.GenerateAccessToken(user);
+                var refreshToken = _jwtService.GenerateRefreshToken();
 
                 return new RegistrationStepResponseDto
                 {
@@ -85,6 +87,7 @@ namespace Service.Services.Auth
             }
         }
 
+
         // STEP 2: Select Role
         public async Task<RegistrationStepResponseDto> SelectRoleAsync(long userId, RoleSelectionDto roleDto)
         {
@@ -102,11 +105,11 @@ namespace Service.Services.Auth
                 }
 
                 // Validate and set role
-                if (!Enum.TryParse<UserRole>(roleDto.Role, out var role) ||
-                    role == UserRole.Unspecified)
+                if (!Enum.TryParse<UserRole>(roleDto.Role, out var role) || role == UserRole.Unspecified)
                 {
                     throw new InvalidOperationException("Vai trò không hợp lệ");
                 }
+
 
                 user.Role = role;
                 user.UpdatedAt = DateTime.UtcNow;

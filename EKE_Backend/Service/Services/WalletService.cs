@@ -20,17 +20,6 @@ public class WalletService : IWalletService
         _logger = logger;
     }
 
-    public async Task<WalletResponseDto?> GetByUserIdAsync(long userId)
-    {
-        var wallet = await _unitOfWork.Wallets
-            .Query()
-            .Include(w => w.User) // Nếu muốn trả luôn thông tin user
-            .FirstOrDefaultAsync(w => w.UserId == userId);
-
-        return wallet == null ? null : _mapper.Map<WalletResponseDto>(wallet);
-    }
-    
-
     public async Task<IEnumerable<WalletResponseDto>> GetAllAsync()
     {
         var wallets = await _unitOfWork.Wallets.GetAllAsync();
@@ -41,9 +30,18 @@ public class WalletService : IWalletService
     {
         var wallet = await _unitOfWork.Wallets
             .Query()
-            .Where(w => w.Id == id)
             .Include(w => w.User)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(w => w.Id == id);
+
+        return wallet == null ? null : _mapper.Map<WalletResponseDto>(wallet);
+    }
+
+    public async Task<WalletResponseDto?> GetByUserIdAsync(long userId)
+    {
+        var wallet = await _unitOfWork.Wallets
+            .Query()
+            .Include(w => w.User)
+            .FirstOrDefaultAsync(w => w.UserId == userId);
 
         return wallet == null ? null : _mapper.Map<WalletResponseDto>(wallet);
     }
@@ -51,12 +49,11 @@ public class WalletService : IWalletService
     public async Task<WalletResponseDto> CreateAsync(WalletRequestDto dto)
     {
         var wallet = _mapper.Map<Wallet>(dto);
+
         await _unitOfWork.Wallets.AddAsync(wallet);
         await _unitOfWork.CompleteAsync();
 
-        // Include User info for mapping response
         wallet.User = await _unitOfWork.Users.GetByIdAsync(wallet.UserId);
-
         return _mapper.Map<WalletResponseDto>(wallet);
     }
 
@@ -65,22 +62,20 @@ public class WalletService : IWalletService
         var wallet = await _unitOfWork.Wallets.GetByIdAsync(id);
         if (wallet == null) return null;
 
-        wallet.Balance = dto.Balance;
-        wallet.UserId = dto.UserId;
+        _mapper.Map(dto, wallet);
         wallet.UpdatedAt = DateTime.UtcNow;
 
         _unitOfWork.Wallets.Update(wallet);
         await _unitOfWork.CompleteAsync();
 
         wallet.User = await _unitOfWork.Users.GetByIdAsync(wallet.UserId);
-
         return _mapper.Map<WalletResponseDto>(wallet);
     }
 
     public async Task<bool> DeleteAsync(long id)
     {
-        var success = await _unitOfWork.Wallets.RemoveByIdAsync(id);
-        if (!success) return false;
+        var removed = await _unitOfWork.Wallets.RemoveByIdAsync(id);
+        if (!removed) return false;
 
         await _unitOfWork.CompleteAsync();
         return true;
@@ -107,5 +102,4 @@ public class WalletService : IWalletService
         await _unitOfWork.CompleteAsync();
         return true;
     }
-
 }
