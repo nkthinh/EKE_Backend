@@ -13,5 +13,7 @@ namespace Service.Services
 
         // Mua gói & trừ tiền trong Wallet
         Task<bool> PurchasePackageAsync(long userId, long packageId);
+
+        Task<SubscriptionPackageResponseDto?> GetCurrentPackageAsync(long userId);
     }
 }

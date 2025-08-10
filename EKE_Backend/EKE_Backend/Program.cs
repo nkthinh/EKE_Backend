@@ -45,6 +45,7 @@ namespace EKE_Backend
 
                 });
 
+
             builder.Services.AddAuthorization();
 
             // CORS
