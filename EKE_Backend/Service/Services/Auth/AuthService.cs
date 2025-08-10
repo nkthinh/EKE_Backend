@@ -45,13 +45,25 @@ namespace Service.Services.Auth
                     Email = accountDto.Email,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(accountDto.Password),
                     FullName = accountDto.FullName,
-                    Role = UserRole.Unspecified, // Chưa chọn role
+                    Role = UserRole.Unspecified,
                     IsActive = true,
+                    SubscriptionPackageId = 1, // ✅ Gán gói mặc định ID=1
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
 
                 await _unitOfWork.Users.AddAsync(user);
+                await _unitOfWork.CompleteAsync();
+
+                // Tạo ví mặc định
+                var wallet = new Wallet
+                {
+                    UserId = user.Id,
+                    Balance = 0,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                await _unitOfWork.Wallets.AddAsync(wallet);
                 await _unitOfWork.CompleteAsync();
 
                 // Generate tokens
@@ -74,6 +86,7 @@ namespace Service.Services.Auth
                 throw;
             }
         }
+
 
         // STEP 2: Select Role
         public async Task<RegistrationStepResponseDto> SelectRoleAsync(long userId, RoleSelectionDto roleDto)

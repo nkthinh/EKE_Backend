@@ -106,40 +106,45 @@ namespace Service.Services.SubscriptionPackages
 
         public async Task<bool> PurchasePackageAsync(long userId, long packageId)
         {
-            try
-            {
-                await _unitOfWork.BeginTransactionAsync();
+            var package = await _unitOfWork.SubscriptionPackages.GetByIdAsync(packageId)
+                ?? throw new ArgumentException("Gói không tồn tại");
 
-                var package = await _unitOfWork.SubscriptionPackages.GetByIdAsync(packageId);
-                if (package == null) throw new ArgumentException("Gói không tồn tại");
+            var wallet = await _unitOfWork.Wallets.GetByUserIdAsync(userId)
+                ?? throw new ArgumentException("Ví không tồn tại");
 
-                var wallet = await _unitOfWork.Wallets.GetByUserIdAsync(userId);
-                if (wallet == null) throw new ArgumentException("Ví không tồn tại");
+            if (wallet.Balance < package.Price)
+                throw new InvalidOperationException("Số dư không đủ để mua gói");
 
-                if (wallet.Balance < package.Price)
-                    throw new InvalidOperationException("Số dư không đủ để mua gói");
+            // Trừ tiền
+            wallet.Balance -= package.Price;
+            _unitOfWork.Wallets.Update(wallet);
 
-                wallet.Balance -= package.Price;
-                _unitOfWork.Wallets.Update(wallet);
+            // Gán gói cho user
+            var user = await _unitOfWork.Users.GetByIdAsync(userId)
+                ?? throw new ArgumentException("Người dùng không tồn tại");
 
-                var user = await _unitOfWork.Users.GetByIdAsync(userId);
-                if (user == null) throw new ArgumentException("Người dùng không tồn tại");
+            user.SubscriptionPackageId = package.Id;
+            user.SubscriptionPackage = package; // Gán luôn object
+            user.UpdatedAt = DateTime.UtcNow;
+            _unitOfWork.Users.Update(user);
 
-                user.SubscriptionPackageId = package.Id;
-                user.UpdatedAt = DateTime.UtcNow;
-                _unitOfWork.Users.Update(user);
+            // Lưu thay đổi
+            await _unitOfWork.CompleteAsync();
 
-                await _unitOfWork.CompleteAsync();
-                await _unitOfWork.CommitTransactionAsync();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                await _unitOfWork.RollbackTransactionAsync();
-                _logger.LogError(ex, "Error buying subscription package: UserId={UserId}, PackageId={PackageId}",
-                    userId, packageId);
-                throw;
-            }
+            return true;
         }
+
+        public async Task<SubscriptionPackageResponseDto?> GetCurrentPackageAsync(long userId)
+        {
+            var user = await _unitOfWork.Users.GetByIdAsync(userId)
+                ?? throw new ArgumentException("Người dùng không tồn tại");
+
+            if (user.SubscriptionPackageId == null)
+                return null;
+
+            var package = await _unitOfWork.SubscriptionPackages.GetByIdAsync(user.SubscriptionPackageId.Value);
+            return package == null ? null : _mapper.Map<SubscriptionPackageResponseDto>(package);
+        }
+
     }
 }

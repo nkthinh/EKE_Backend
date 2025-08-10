@@ -49,18 +49,18 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var wallet = await _userService.GetUserByIdAsync(userId);
+                var wallet = await _walletService.GetByUserIdAsync(userId);
+                if (wallet == null)
+                    return NotFound("Wallet not found");
+
                 return Ok(wallet);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
                 return BadRequest($"Error retrieving wallet: {ex.Message}");
             }
         }
+
 
         /// <summary>
         /// Create a new wallet

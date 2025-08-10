@@ -115,21 +115,20 @@ namespace EKE_Backend.Controllers
             }
         }
 
-        // POST: api/subscriptions/{packageId}/purchase
         [HttpPost("{packageId:long}/purchase")]
+        [Authorize]
         public async Task<IActionResult> PurchasePackage(long packageId)
         {
             try
             {
-                var currentUserId = long.Parse(User.FindFirst("UserId")?.Value ?? "0");
-                if (currentUserId <= 0)
+                var userIdClaim = User.FindFirstValue("UserId");
+                if (!long.TryParse(userIdClaim, out var currentUserId) || currentUserId <= 0)
                     return Unauthorized(new { success = false, message = "Không xác định được người dùng" });
 
                 var success = await _subscriptionService.PurchasePackageAsync(currentUserId, packageId);
-                if (!success)
-                    return BadRequest(new { success = false, message = "Số dư không đủ hoặc lỗi giao dịch" });
-
-                return Ok(new { success = true, message = "Mua gói thành công" });
+                return success
+                    ? Ok(new { success = true, message = "Mua gói thành công" })
+                    : BadRequest(new { success = false, message = "Lỗi không xác định" });
             }
             catch (ArgumentException ex)
             {
@@ -137,12 +136,42 @@ namespace EKE_Backend.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return Conflict(new { success = false, message = ex.Message });
+                return BadRequest(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
+
+        // GET: api/subscriptions/current
+        [HttpGet("current")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentPackage()
+        {
+            try
+            {
+                var userIdClaim = User.FindFirstValue("UserId");
+                if (!long.TryParse(userIdClaim, out var currentUserId) || currentUserId <= 0)
+                    return Unauthorized(new { success = false, message = "Không xác định được người dùng" });
+
+                var package = await _subscriptionService.GetCurrentPackageAsync(currentUserId);
+                if (package == null)
+                    return Ok(new { success = true, data = (object?)null, message = "Người dùng chưa đăng ký gói nào" });
+
+                return Ok(new { success = true, data = package });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+
+
     }
 }

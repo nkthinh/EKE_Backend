@@ -18,5 +18,8 @@ namespace Service.Services
 
         Task<decimal> GetTotalBalanceAsync();
         Task<bool> UpdateBalanceAsync(long userId, decimal amount);
+
+        Task<WalletResponseDto?> GetByUserIdAsync(long userId);
+
     }
 }
